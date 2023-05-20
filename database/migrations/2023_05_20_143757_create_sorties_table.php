@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Employe;
+use App\Models\Journee;
 use App\Models\QrCode;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -13,13 +14,16 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('sorties', function (Blueprint $table) {
             $table->increments('id');
+            $table->timestamps();
             $table->foreignIdFor(Employe::class)->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->time('scanned_at', );
+            $table->foreignIdFor(Journee::class)->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->time('scanned_at' );
             $table->integer('ponctualite');
+            $table->unique(["employe_id","journee_id"]);
             $table->foreignIdFor(QrCode::class)->nullable(false);
         });
     }
@@ -29,7 +33,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('sorties');
     }

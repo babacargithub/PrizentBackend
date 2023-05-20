@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Abonnement;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,13 +12,15 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('abonnement_id');
+            $table->foreignIdFor(Abonnement::class)->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->integer('montant');
             $table->string('paye_par', 11)->nullable();
+            $table->timestamps();
+
         });
     }
 
@@ -26,7 +29,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('payments');
     }

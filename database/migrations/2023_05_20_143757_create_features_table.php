@@ -11,12 +11,16 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('features', function (Blueprint $table) {
             $table->increments('id');
+            $table->softDeletes();
             $table->string('public_name', 190)->unique();
-            $table->string('constant_name', 250)->unique();;
+            $table->string('constant_name', 250)->unique();
+            $table->boolean('disabled')->default(false);
+            $table->timestamps();
+
         });
     }
 
@@ -25,7 +29,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('features');
     }

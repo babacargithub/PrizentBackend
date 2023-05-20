@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Employe;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -18,8 +19,9 @@ return new class extends Migration
             $table->integer('jour');
             $table->time('entree');
             $table->time('sortie');
-            $table->integer('employe_id');
+            $table->foreignIdFor(Employe::class)->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->unique(['employe_id', 'jour'], 'Unique_Jour_Employee');
+
         });
     }
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Company;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,11 +16,14 @@ return new class extends Migration
     {
         Schema::create('qr_codes', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->integer('company_id')->nullable();
+            $table->string('nom');
+            $table->foreignIdFor(Company::class)->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->bigInteger('latitude');
             $table->bigInteger('longitude');
+            $table->unique(["company_id","nom"]);
             $table->boolean('disabled')->default(false);
+            $table->timestamps();
+
         });
     }
 

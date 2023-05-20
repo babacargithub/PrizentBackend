@@ -21,6 +21,8 @@ return new class extends Migration
             $table->integer('prix');
             $table->integer('duree');
             $table->string('unite')->default("mois");
+            $table->timestamps();
+
         });
     }
 
