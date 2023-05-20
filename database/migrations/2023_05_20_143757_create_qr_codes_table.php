@@ -13,9 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('sorties', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::create('qr_codes', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->integer('company_id')->nullable();
+            $table->bigInteger('latitude');
+            $table->bigInteger('longitude');
+            $table->boolean('disabled')->default(false);
         });
     }
 
@@ -26,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('sorties');
+        Schema::dropIfExists('qr_codes');
     }
 };

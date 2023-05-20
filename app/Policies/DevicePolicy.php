@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Payment;
+use App\Models\Appareil;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class PaymentAbonnementPolicy
+class DevicePolicy
 {
     use HandlesAuthorization;
 
@@ -25,10 +25,10 @@ class PaymentAbonnementPolicy
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Payment  $paymentAbonnement
+     * @param  \App\Models\Appareil  $device
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, Payment $paymentAbonnement)
+    public function view(User $user, Appareil $device)
     {
         //
     }
@@ -48,10 +48,10 @@ class PaymentAbonnementPolicy
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Payment  $paymentAbonnement
+     * @param  \App\Models\Appareil  $device
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, Payment $paymentAbonnement)
+    public function update(User $user, Appareil $device)
     {
         //
     }
@@ -60,10 +60,10 @@ class PaymentAbonnementPolicy
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Payment  $paymentAbonnement
+     * @param  \App\Models\Appareil  $device
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, Payment $paymentAbonnement)
+    public function delete(User $user, Appareil $device)
     {
         //
     }
@@ -72,10 +72,10 @@ class PaymentAbonnementPolicy
      * Determine whether the user can restore the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Payment  $paymentAbonnement
+     * @param  \App\Models\Appareil  $device
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, Payment $paymentAbonnement)
+    public function restore(User $user, Appareil $device)
     {
         //
     }
@@ -84,10 +84,10 @@ class PaymentAbonnementPolicy
      * Determine whether the user can permanently delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Payment  $paymentAbonnement
+     * @param  \App\Models\Appareil  $device
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, Payment $paymentAbonnement)
+    public function forceDelete(User $user, Appareil $device)
     {
         //
     }

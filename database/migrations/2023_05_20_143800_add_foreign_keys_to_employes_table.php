@@ -13,9 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('qr_codes', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('employes', function (Blueprint $table) {
+            $table->foreign(['id'], 'employes_ibfk_1')->references(['id'])->on('societes')->onUpdate('CASCADE')->onDelete('CASCADE');
         });
     }
 
@@ -26,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('qr_codes');
+        Schema::table('employes', function (Blueprint $table) {
+            $table->dropForeign('employes_ibfk_1');
+        });
     }
 };

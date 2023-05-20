@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreEmployeeRequest;
-use App\Http\Requests\UpdateEmployeeRequest;
-use App\Models\Employe;
+use App\Http\Requests\StoreDeviceRequest;
+use App\Http\Requests\UpdateDeviceRequest;
+use App\Models\Appareil;
 
-class EmployeeController extends Controller
+class DeviceController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -31,10 +31,10 @@ class EmployeeController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StoreEmployeeRequest  $request
+     * @param  \App\Http\Requests\StoreDeviceRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreEmployeeRequest $request)
+    public function store(StoreDeviceRequest $request)
     {
         //
     }
@@ -42,10 +42,10 @@ class EmployeeController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Employe  $employee
+     * @param  \App\Models\Appareil  $device
      * @return \Illuminate\Http\Response
      */
-    public function show(Employe $employee)
+    public function show(Appareil $device)
     {
         //
     }
@@ -53,10 +53,10 @@ class EmployeeController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Employe  $employee
+     * @param  \App\Models\Appareil  $device
      * @return \Illuminate\Http\Response
      */
-    public function edit(Employe $employee)
+    public function edit(Appareil $device)
     {
         //
     }
@@ -64,11 +64,11 @@ class EmployeeController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\UpdateEmployeeRequest  $request
-     * @param  \App\Models\Employe  $employee
+     * @param  \App\Http\Requests\UpdateDeviceRequest  $request
+     * @param  \App\Models\Appareil  $device
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateEmployeeRequest $request, Employe $employee)
+    public function update(UpdateDeviceRequest $request, Appareil $device)
     {
         //
     }
@@ -76,10 +76,10 @@ class EmployeeController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Employe  $employee
+     * @param  \App\Models\Appareil  $device
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Employe $employee)
+    public function destroy(Appareil $device)
     {
         //
     }

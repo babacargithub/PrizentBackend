@@ -13,9 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('payment_abonnements', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::create('users', function (Blueprint $table) {
+            $table->increments('id');
         });
     }
 
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('payment_abonnements');
+        Schema::dropIfExists('users');
     }
 };

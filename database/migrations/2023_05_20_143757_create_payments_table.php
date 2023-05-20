@@ -13,9 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('abonnements', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::create('payments', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('abonnement_id');
+            $table->integer('montant');
+            $table->string('paye_par', 11)->nullable();
         });
     }
 
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('abonnements');
+        Schema::dropIfExists('payments');
     }
 };

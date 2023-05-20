@@ -14,8 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::create('journees', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+            $table->increments('id');
+            $table->integer('name')->unique();
+            $table->date('calendrier')->unique();
+            $table->boolean('ferie')->default(false);
         });
     }
 

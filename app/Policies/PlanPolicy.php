@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Models\Plan;
+use App\Models\Formule;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -25,10 +25,10 @@ class PlanPolicy
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Plan  $plan
+     * @param  \App\Models\Formule  $plan
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, Plan $plan)
+    public function view(User $user, Formule $plan)
     {
         //
     }
@@ -48,10 +48,10 @@ class PlanPolicy
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Plan  $plan
+     * @param  \App\Models\Formule  $plan
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, Plan $plan)
+    public function update(User $user, Formule $plan)
     {
         //
     }
@@ -60,10 +60,10 @@ class PlanPolicy
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Plan  $plan
+     * @param  \App\Models\Formule  $plan
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, Plan $plan)
+    public function delete(User $user, Formule $plan)
     {
         //
     }
@@ -72,10 +72,10 @@ class PlanPolicy
      * Determine whether the user can restore the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Plan  $plan
+     * @param  \App\Models\Formule  $plan
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, Plan $plan)
+    public function restore(User $user, Formule $plan)
     {
         //
     }
@@ -84,10 +84,10 @@ class PlanPolicy
      * Determine whether the user can permanently delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Plan  $plan
+     * @param  \App\Models\Formule  $plan
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, Plan $plan)
+    public function forceDelete(User $user, Formule $plan)
     {
         //
     }

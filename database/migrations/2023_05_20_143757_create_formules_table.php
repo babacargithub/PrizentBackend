@@ -13,9 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('companies', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::create('formules', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('nom')->unique();
+            $table->string('comment');
+            $table->integer('limite');
+            $table->integer('prix');
+            $table->integer('duree');
+            $table->string('unite')->default("mois");
         });
     }
 
@@ -26,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('companies');
+        Schema::dropIfExists('formules');
     }
 };

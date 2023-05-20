@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Models\Employee;
+use App\Models\Employe;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -25,10 +25,10 @@ class EmployeePolicy
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Employee  $employee
+     * @param  \App\Models\Employe  $employee
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, Employee $employee)
+    public function view(User $user, Employe $employee)
     {
         //
     }
@@ -48,10 +48,10 @@ class EmployeePolicy
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Employee  $employee
+     * @param  \App\Models\Employe  $employee
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, Employee $employee)
+    public function update(User $user, Employe $employee)
     {
         //
     }
@@ -60,10 +60,10 @@ class EmployeePolicy
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Employee  $employee
+     * @param  \App\Models\Employe  $employee
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, Employee $employee)
+    public function delete(User $user, Employe $employee)
     {
         //
     }
@@ -72,10 +72,10 @@ class EmployeePolicy
      * Determine whether the user can restore the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Employee  $employee
+     * @param  \App\Models\Employe  $employee
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, Employee $employee)
+    public function restore(User $user, Employe $employee)
     {
         //
     }
@@ -84,10 +84,10 @@ class EmployeePolicy
      * Determine whether the user can permanently delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Employee  $employee
+     * @param  \App\Models\Employe  $employee
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, Employee $employee)
+    public function forceDelete(User $user, Employe $employee)
     {
         //
     }

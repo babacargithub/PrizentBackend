@@ -13,9 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('plans', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::create('horaires_employes', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('jour');
+            $table->time('entree');
+            $table->time('sortie');
+            $table->integer('employe_id');
+            $table->unique(['employe_id', 'jour'], 'Unique_Jour_Employee');
         });
     }
 
@@ -26,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('plans');
+        Schema::dropIfExists('horaires_employes');
     }
 };

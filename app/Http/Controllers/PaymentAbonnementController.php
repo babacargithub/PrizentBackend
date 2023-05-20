@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePaymentAbonnementRequest;
 use App\Http\Requests\UpdatePaymentAbonnementRequest;
-use App\Models\PaymentAbonnement;
+use App\Models\Payment;
 
 class PaymentAbonnementController extends Controller
 {
@@ -42,10 +42,10 @@ class PaymentAbonnementController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\PaymentAbonnement  $paymentAbonnement
+     * @param  \App\Models\Payment  $paymentAbonnement
      * @return \Illuminate\Http\Response
      */
-    public function show(PaymentAbonnement $paymentAbonnement)
+    public function show(Payment $paymentAbonnement)
     {
         //
     }
@@ -53,10 +53,10 @@ class PaymentAbonnementController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\PaymentAbonnement  $paymentAbonnement
+     * @param  \App\Models\Payment  $paymentAbonnement
      * @return \Illuminate\Http\Response
      */
-    public function edit(PaymentAbonnement $paymentAbonnement)
+    public function edit(Payment $paymentAbonnement)
     {
         //
     }
@@ -65,10 +65,10 @@ class PaymentAbonnementController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \App\Http\Requests\UpdatePaymentAbonnementRequest  $request
-     * @param  \App\Models\PaymentAbonnement  $paymentAbonnement
+     * @param  \App\Models\Payment  $paymentAbonnement
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdatePaymentAbonnementRequest $request, PaymentAbonnement $paymentAbonnement)
+    public function update(UpdatePaymentAbonnementRequest $request, Payment $paymentAbonnement)
     {
         //
     }
@@ -76,10 +76,10 @@ class PaymentAbonnementController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\PaymentAbonnement  $paymentAbonnement
+     * @param  \App\Models\Payment  $paymentAbonnement
      * @return \Illuminate\Http\Response
      */
-    public function destroy(PaymentAbonnement $paymentAbonnement)
+    public function destroy(Payment $paymentAbonnement)
     {
         //
     }

@@ -13,9 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('horaires', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::create('abonnements', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('company_id')->unique('company_id');
+            $table->integer('formule_id');
+            $table->dateTime('date_expir');
         });
     }
 
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('horaires');
+        Schema::dropIfExists('abonnements');
     }
 };

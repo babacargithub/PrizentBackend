@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreHoraireRequest;
 use App\Http\Requests\UpdateHoraireRequest;
-use App\Models\Horaire;
+use App\Models\HoraireEmploye;
 
 class HoraireController extends Controller
 {
@@ -42,10 +42,10 @@ class HoraireController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Horaire  $horaire
+     * @param  \App\Models\HoraireEmploye  $horaire
      * @return \Illuminate\Http\Response
      */
-    public function show(Horaire $horaire)
+    public function show(HoraireEmploye $horaire)
     {
         //
     }
@@ -53,10 +53,10 @@ class HoraireController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Horaire  $horaire
+     * @param  \App\Models\HoraireEmploye  $horaire
      * @return \Illuminate\Http\Response
      */
-    public function edit(Horaire $horaire)
+    public function edit(HoraireEmploye $horaire)
     {
         //
     }
@@ -65,10 +65,10 @@ class HoraireController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \App\Http\Requests\UpdateHoraireRequest  $request
-     * @param  \App\Models\Horaire  $horaire
+     * @param  \App\Models\HoraireEmploye  $horaire
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateHoraireRequest $request, Horaire $horaire)
+    public function update(UpdateHoraireRequest $request, HoraireEmploye $horaire)
     {
         //
     }
@@ -76,10 +76,10 @@ class HoraireController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Horaire  $horaire
+     * @param  \App\Models\HoraireEmploye  $horaire
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Horaire $horaire)
+    public function destroy(HoraireEmploye $horaire)
     {
         //
     }
