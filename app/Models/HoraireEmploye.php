@@ -7,5 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class HoraireEmploye extends Model
 {
+    protected $table = "horaires_employes";
     use HasFactory;
 }
