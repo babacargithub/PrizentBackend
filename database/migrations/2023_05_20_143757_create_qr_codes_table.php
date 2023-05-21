@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Company;
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,15 +12,13 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('qr_codes', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nom');
-            $table->foreignIdFor(Company::class)->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->bigInteger('latitude');
             $table->bigInteger('longitude');
-            $table->unique(["company_id","nom"]);
             $table->boolean('disabled')->default(false);
             $table->timestamps();
 
@@ -32,7 +30,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('qr_codes');
     }
