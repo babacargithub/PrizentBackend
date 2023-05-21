@@ -17,3 +17,16 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::post('/login', function (\Illuminate\Http\Request $request){
+    $credentials = $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
+    if (Auth::attempt($credentials)) {
+        return response(request()->user()->createToken("name"));
+    }else{
+
+        return response("Invalid credentials")->setStatusCode(401);
+    }
+
+});

@@ -2,9 +2,11 @@
 
 namespace App\Policies;
 
+use App\Models\Company;
 use App\Models\Employe;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 
 class EmployeePolicy
 {
@@ -13,8 +15,8 @@ class EmployeePolicy
     /**
      * Determine whether the user can view any models.
      *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
+     * @param User $user
+     * @return Response|bool
      */
     public function viewAny(User $user)
     {
@@ -24,9 +26,9 @@ class EmployeePolicy
     /**
      * Determine whether the user can view the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Employe  $employee
-     * @return \Illuminate\Auth\Access\Response|bool
+     * @param User $user
+     * @param Employe $employee
+     * @return Response|bool
      */
     public function view(User $user, Employe $employee)
     {
@@ -36,59 +38,67 @@ class EmployeePolicy
     /**
      * Determine whether the user can create models.
      *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
+     * @param User $user
+     * @return Response|bool
      */
     public function create(User $user)
     {
         //
+        return Company::requireLoggedInCompany()->hasActiveSubscription();
     }
 
     /**
      * Determine whether the user can update the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Employe  $employee
-     * @return \Illuminate\Auth\Access\Response|bool
+     * @param User $user
+     * @param Employe $employee
+     * @return Response|bool
      */
-    public function update(User $user, Employe $employee)
+    public function update(User $user, Employe $employee): Response|bool
     {
         //
+        return $user->id == $employee->company->user->id;
     }
 
     /**
      * Determine whether the user can delete the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Employe  $employee
-     * @return \Illuminate\Auth\Access\Response|bool
+     * @param User $user
+     * @param Employe $employee
+     * @return Response|bool
      */
     public function delete(User $user, Employe $employee)
     {
         //
+        return $user->id == $employee->company->user->id;
+
     }
 
     /**
      * Determine whether the user can restore the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Employe  $employee
-     * @return \Illuminate\Auth\Access\Response|bool
+     * @param User $user
+     * @param Employe $employee
+     * @return Response|bool
      */
     public function restore(User $user, Employe $employee)
     {
         //
+        return $user->id == $employee->company->user->id;
+
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Employe  $employee
-     * @return \Illuminate\Auth\Access\Response|bool
+     * @param User $user
+     * @param Employe $employee
+     * @return Response|bool
      */
     public function forceDelete(User $user, Employe $employee)
     {
         //
+        return $user->id == $employee->company->user->id;
+
     }
 }

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Alert;
 use App\Http\Requests\CompanyRequest;
 use App\Models\Company;
+use App\Models\User;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
@@ -12,6 +14,8 @@ use Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanel;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * Class CompanyCrudController
@@ -95,6 +99,26 @@ class CompanyCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+    }
+
+    public function store(CompanyRequest $request)
+    {
+        $company = new Company($this->crud->getStrippedSaveRequest($request));
+        $userAccount = new User();
+        $userAccount->email = $company->email;
+        $userAccount->name = $company->nom;
+        $userAccount->email_verified_at = Carbon::now();
+        $userAccount->password = Hash::make("0000");
+        $userAccount->save();
+        $company->user()->associate($userAccount);
+        $company->save();
+        // show a success message
+        Alert::success(trans('backpack::crud.insert_success'))->flash();
+
+        // save the redirect choice for next time
+        $this->crud->setSaveAction();
+
+        return $this->crud->performSaveAction($company->getKey());
     }
 
 }

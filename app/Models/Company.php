@@ -6,6 +6,9 @@ use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Company extends Model
 {
@@ -17,8 +20,40 @@ class Company extends Model
     /**
      * @noinspection PhpUnused
      */
-    public function userAccount() : BelongsTo
+    public function user() : BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function abonnement(): HasOne
+    {
+        return $this->hasOne(Abonnement::class);
+
+    }
+    public function employes(): HasMany
+    {
+        return $this->hasMany(Employe::class);
+
+    }
+
+    public function QrCodes(): HasMany
+    {
+        return $this->hasMany(QrCode::class);
+
+    }
+
+    public static  function requireLoggedInCompany() : Company {
+
+        /** @noinspection UnknownColumnInspection */
+        $company = Company::where('user_id',request()->user()->id)->first();
+        if ($company == null){
+            throw new NotFoundHttpException("Unable to find company with user account id");
+        }
+        return $company;
+    }
+
+    public function hasActiveSubscription(): bool
+    {
+        return $this->abonnemen != null && $this->abonnement->isActive();
     }
 }
