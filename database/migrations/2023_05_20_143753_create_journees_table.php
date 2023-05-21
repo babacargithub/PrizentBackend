@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('journees', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
             $table->integer('name')->unique();
             $table->date('calendrier')->unique();
             $table->boolean('ferie')->default(false);

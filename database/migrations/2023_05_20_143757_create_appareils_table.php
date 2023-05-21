@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('appareils', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
             $table->timestamps();
             $table->string('name', 190);
             $table->dateTime('last_active')->nullable();

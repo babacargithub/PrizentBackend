@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('payments', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
             $table->integer('montant');
             $table->string('paye_par', 11)->nullable();
             $table->timestamps();

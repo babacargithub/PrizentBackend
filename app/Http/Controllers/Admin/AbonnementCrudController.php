@@ -2,39 +2,33 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\CompanyRequest;
-use App\Models\Company;
+use App\Http\Requests\AbonnementRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
-use Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
-use Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
-use Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
-use Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
-use Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
-use Backpack\CRUD\app\Library\CrudPanel\CrudPanel;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
 /**
- * Class CompanyCrudController
+ * Class AbonnementCrudController
  * @package App\Http\Controllers\Admin
- * @property-read CrudPanel $crud
+ * @property-read \Backpack\CRUD\app\Library\CrudPanel\CrudPanel $crud
  */
-class CompanyCrudController extends CrudController
+class AbonnementCrudController extends CrudController
 {
-    use ListOperation;
-    use CreateOperation;
-    use UpdateOperation;
-    use DeleteOperation;
-    use ShowOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
+     *
      * @return void
      */
     public function setup()
     {
-        CRUD::setModel(Company::class);
-        CRUD::setRoute(config('backpack.base.route_prefix') . '/company');
-        CRUD::setEntityNameStrings('Société', 'Sociétés');
+        CRUD::setModel(\App\Models\Abonnement::class);
+        CRUD::setRoute(config('backpack.base.route_prefix') . '/abonnement');
+        CRUD::setEntityNameStrings('abonnement', 'abonnements');
     }
 
     /**
@@ -42,15 +36,17 @@ class CompanyCrudController extends CrudController
      *
      * @see  https://backpackforlaravel.com/docs/crud-operation-list-entries
      * @return void
-     * @noinspection PhpUnused
      */
     protected function setupListOperation()
     {
-        CRUD::column('nom');
-        CRUD::column('telephone')->label("Contact");
-        CRUD::column('email');
-        CRUD::column('latitude');
-        CRUD::column('longitude');
+        CRUD::column('company_id');
+        CRUD::column('formule_id');
+        CRUD::column('created_at');
+        CRUD::column('updated_at');
+        CRUD::column('deleted_at');
+        CRUD::column('date_expir');
+
+        $this->crud->removeAllButtonsFromStack("top");
 
 
         /**
@@ -68,15 +64,11 @@ class CompanyCrudController extends CrudController
      */
     protected function setupCreateOperation()
     {
-        CRUD::setValidation(CompanyRequest::class);
+        CRUD::setValidation(AbonnementRequest::class);
 
-        CRUD::field('nom');
-        CRUD::field('email');
-        CRUD::field('telephone');
-        CRUD::field('adresse');
-        CRUD::field('region');
-        CRUD::field('latitude');
-        CRUD::field('longitude');
+        CRUD::field('date_expir');
+        CRUD::field('company_id');
+        CRUD::field('formule_id');
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:
@@ -90,11 +82,9 @@ class CompanyCrudController extends CrudController
      *
      * @see https://backpackforlaravel.com/docs/crud-operation-update
      * @return void
-     * @noinspection PhpUnused
      */
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
     }
-
 }

@@ -21,50 +21,50 @@ return new class extends Migration
     {
         //
         Schema::table("employes",function (Blueprint $table){
-            $table->foreignIdFor(Company::class)->type("integer")->nullable(false)->constrained();
+            $table->foreignIdFor(Company::class)->nullable(false)->constrained();
         });
        Schema::table('horaires_employes', function (Blueprint $table) {
 
-            $table->foreignIdFor(Employe::class)->type("integer")->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignIdFor(Employe::class)->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->unique(['employe_id', 'jour'], 'Unique_Jour_Employee');
 
         });
         Schema::table('abonnements', function (Blueprint $table) {
 
-            $table->foreignIdFor(Company::class)->type("integer")->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignIdFor(Formule::class)->type("integer")->nullable(false)->constrained()->restrictOnDelete()->cascadeOnUpdate();
+            $table->foreignIdFor(Company::class)->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignIdFor(Formule::class)->nullable(false)->constrained()->restrictOnDelete()->cascadeOnUpdate();
 
         });
         Schema::table('appareils', function (Blueprint $table) {
 
-            $table->foreignIdFor(Employe::class)->type("integer")->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignIdFor(Employe::class)->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
 
         });
         Schema::table('entrees', function (Blueprint $table) {
 
-            $table->foreignIdFor(Employe::class)->type("integer")->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignIdFor(Journee::class)->type("integer")->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignIdFor(QrCode::class)->type("integer")->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignIdFor(Employe::class)->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignIdFor(Journee::class)->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignIdFor(QrCode::class)->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->unique(["employe_id","journee_id"]);
 
         });
         Schema::table('sorties', function (Blueprint $table) {
 
-            $table->foreignIdFor(Employe::class)->type("integer")->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignIdFor(Journee::class)->type("integer")->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignIdFor(QrCode::class)->type("integer")->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignIdFor(Employe::class)->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignIdFor(Journee::class)->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignIdFor(QrCode::class)->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->unique(["employe_id","journee_id"]);
 
         });
         Schema::table('payments', function (Blueprint $table) {
 
-            $table->foreignIdFor(Abonnement::class)->type("integer")->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignIdFor(Abonnement::class)->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
 
 
         });
         Schema::table('qr_codes', function (Blueprint $table) {
 
-            $table->foreignIdFor(Company::class)->type("integer")->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignIdFor(Company::class)->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->unique(["company_id","nom"]);
 
         });

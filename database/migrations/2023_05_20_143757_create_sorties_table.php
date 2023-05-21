@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('sorties', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
             $table->timestamps();
             $table->time('scanned_at' );
             $table->integer('ponctualite');

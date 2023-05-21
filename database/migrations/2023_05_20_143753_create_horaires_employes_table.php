@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('horaires_employes', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
             $table->integer('jour');
             $table->time('entree');
             $table->time('sortie');

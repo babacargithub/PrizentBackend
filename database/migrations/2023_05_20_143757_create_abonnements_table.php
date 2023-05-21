@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('abonnements', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
             $table->timestamps();
             $table->softDeletes();
            $table->dateTime('date_expir');
