@@ -44,7 +44,6 @@ class Company extends Model
 
     public static  function requireLoggedInCompany() : Company {
 
-        /** @noinspection UnknownColumnInspection */
         $company = Company::where('user_id',request()->user()->id)->first();
         if ($company == null){
             throw new NotFoundHttpException("Unable to find company with user account id");

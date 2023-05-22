@@ -19,10 +19,8 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        //
-
-        $this->authorize("viewAny", Employe::class);
-        return EmployeResource::collection(Employe::where('company_id', Company::requireLoggedInCompany()->id)->get());
+//        $this->authorize("viewAny", Employe::class);
+        return Company::requireLoggedInCompany()->employes()->with("devices")->get();
 
     }
 
@@ -46,14 +44,14 @@ class EmployeeController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param Employe $employee
-     * @return EmployeResource
+     * @param Employe $employe
+     * @return Employe
      */
-    public function show(Employe $employee)
+    public function show(Employe $employe)
     {
-        //
-        $this->authorize("view", $employee);
-       return new EmployeResource($employee);
+        //todo uncomment
+//        $this->authorize("view", $employe);
+       return $employe;
     }
 
 
@@ -62,30 +60,31 @@ class EmployeeController extends Controller
      * Update the specified resource in storage.
      *
      * @param UpdateEmployeeRequest $request
-     * @param Employe $employee
+     * @param Employe $employe
      * @return Employe
      */
-    public function update(UpdateEmployeeRequest $request, Employe $employee)
+    public function update(UpdateEmployeeRequest $request, Employe $employe)
     {
-        //
-        $this->authorize("update",$employee);
+        //todo uncomment later
+//        $this->authorize("update",$employe);
 
-         Employe::update($request->input());
+            $employe->update($request->input());
 
-         return  $employee;
+         return  $employe;
 
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param Employe $employee
+     * @param Employe $employe
      * @return Response
      */
-    public function destroy(Employe $employee)
+    public function destroy(Employe $employe)
     {
-        $this->authorize("delete",$employee);
-        $employee->delete();
+        //todo un comment later
+//        $this->authorize("delete",$employe);
+        $employe->delete();
         return  new Response('deleted');
     }
 }

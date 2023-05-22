@@ -73,7 +73,6 @@ class CompanyCrudController extends CrudController
     protected function setupCreateOperation()
     {
         CRUD::setValidation(CompanyRequest::class);
-
         CRUD::field('nom');
         CRUD::field('email');
         CRUD::field('telephone');

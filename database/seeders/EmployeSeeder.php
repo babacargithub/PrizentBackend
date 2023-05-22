@@ -4,10 +4,10 @@ namespace Database\Seeders;
 
 use App\Models\Company;
 use App\Models\Employe;
+use App\Models\HoraireEmploye;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-
+/** @noinspection PhpUnused */
 class EmployeSeeder extends Seeder
 {
     /**
@@ -24,6 +24,13 @@ class EmployeSeeder extends Seeder
         $company->save();
         $employees = Employe::factory()->count(20)->make();
         $company->employes()->saveMany($employees);
+        foreach ($employees as $index=>$employee) {
+            $horaires = HoraireEmploye::factory()->count(7)->make();
+            dump($employee);
+//            foreach ($horaires as $horaire) {
+//                $employee->horaires()->save($horaire);
+//            }
+        }
 
     }
 }

@@ -2,10 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\Journee;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class JourneeSeeder extends Seeder
+class
+JourneeSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,5 +17,6 @@ class JourneeSeeder extends Seeder
     public function run()
     {
         //
+        $journee  = Journee::factory()->create();
     }
 }

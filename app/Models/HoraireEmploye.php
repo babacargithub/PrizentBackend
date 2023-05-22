@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class HoraireEmploye extends Model
 {
+    public $timestamps = false;
     protected $table = "horaires_employes";
     use HasFactory;
 

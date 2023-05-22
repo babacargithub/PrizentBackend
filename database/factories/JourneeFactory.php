@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,6 +18,10 @@ class JourneeFactory extends Factory
     public function definition()
     {
         return [
+            "name" => "Journé du xjxj",
+            "calendrier" => Carbon::today()->toDate(),
+            "ferie" => false
+
             //
         ];
     }

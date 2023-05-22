@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('jour');
             $table->time('entree');
             $table->time('sortie');
+            $table->boolean('repos')->default(false);
 
         });
     }

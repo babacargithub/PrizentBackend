@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('journees', function (Blueprint $table) {
             $table->id();
-            $table->integer('name')->unique();
+            $table->string('name')->unique();
             $table->date('calendrier')->unique();
             $table->boolean('ferie')->default(false);
         });

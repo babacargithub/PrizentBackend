@@ -14,6 +14,7 @@ class Employe extends Model
 {
     use HasFactory;
 
+    protected $fillable = ["prenom","nom","sexe","telephone","email","id","company_id","disabled"];
     public function company() : BelongsTo
     {
         return  $this->belongsTo(Company::class);
@@ -23,6 +24,12 @@ class Employe extends Model
     public function devices(): HasMany
     {
         return $this->hasMany(Appareil::class);
+
+    }
+
+    public function horaires(): HasMany
+    {
+        return $this->hasMany(HoraireEmploye::class);
 
     }
 }
