@@ -1,10 +1,13 @@
-<?php
+<?php /** @noinspection UnknownColumnInspection */
 
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
+use App\Http\Resources\EmployeResource;
+use App\Models\Company;
 use App\Models\Employe;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
 
 class EmployeeController extends Controller
@@ -12,11 +15,14 @@ class EmployeeController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return JsonResource
      */
     public function index()
     {
         //
+
+        $this->authorize("viewAny", Employe::class);
+        return EmployeResource::collection(Employe::where('company_id', Company::requireLoggedInCompany()->id)->get());
 
     }
 
@@ -41,12 +47,13 @@ class EmployeeController extends Controller
      * Display the specified resource.
      *
      * @param Employe $employee
-     * @return Employe
+     * @return EmployeResource
      */
     public function show(Employe $employee)
     {
         //
-       return $employee;
+        $this->authorize("view", $employee);
+       return new EmployeResource($employee);
     }
 
 
@@ -56,11 +63,16 @@ class EmployeeController extends Controller
      *
      * @param UpdateEmployeeRequest $request
      * @param Employe $employee
-     * @return Response
+     * @return Employe
      */
     public function update(UpdateEmployeeRequest $request, Employe $employee)
     {
         //
+        $this->authorize("update",$employee);
+
+         Employe::update($request->input());
+
+         return  $employee;
 
     }
 
@@ -72,6 +84,8 @@ class EmployeeController extends Controller
      */
     public function destroy(Employe $employee)
     {
-        //
+        $this->authorize("delete",$employee);
+        $employee->delete();
+        return  new Response('deleted');
     }
 }

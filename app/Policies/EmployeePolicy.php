@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnusedParameterInspection */
 
 namespace App\Policies;
 
@@ -18,9 +18,11 @@ class EmployeePolicy
      * @param User $user
      * @return Response|bool
      */
-    public function viewAny(User $user)
+    public function viewAny(User $user): Response|bool
     {
         //
+        return Company::requireLoggedInCompany()->hasActiveSubscription();
+
     }
 
     /**
@@ -28,11 +30,13 @@ class EmployeePolicy
      *
      * @param User $user
      * @param Employe $employee
-     * @return Response|bool
+     * @return bool
      */
-    public function view(User $user, Employe $employee)
+    public function view(User $user, Employe $employee): bool
     {
         //
+        return $user->id == $employee->company->user->id;
+
     }
 
     /**
@@ -41,7 +45,7 @@ class EmployeePolicy
      * @param User $user
      * @return Response|bool
      */
-    public function create(User $user)
+    public function create(User $user): Response|bool
     {
         //
         return Company::requireLoggedInCompany()->hasActiveSubscription();
@@ -65,9 +69,9 @@ class EmployeePolicy
      *
      * @param User $user
      * @param Employe $employee
-     * @return Response|bool
+     * @return bool
      */
-    public function delete(User $user, Employe $employee)
+    public function delete(User $user, Employe $employee): bool
     {
         //
         return $user->id == $employee->company->user->id;
@@ -81,7 +85,7 @@ class EmployeePolicy
      * @param Employe $employee
      * @return Response|bool
      */
-    public function restore(User $user, Employe $employee)
+    public function restore(User $user, Employe $employee): Response|bool
     {
         //
         return $user->id == $employee->company->user->id;
@@ -95,7 +99,7 @@ class EmployeePolicy
      * @param Employe $employee
      * @return Response|bool
      */
-    public function forceDelete(User $user, Employe $employee)
+    public function forceDelete(User $user, Employe $employee): Response|bool
     {
         //
         return $user->id == $employee->company->user->id;

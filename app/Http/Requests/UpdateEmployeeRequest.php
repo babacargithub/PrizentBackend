@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Company;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateEmployeeRequest extends FormRequest
@@ -14,8 +13,7 @@ class UpdateEmployeeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $employe_company = 1;
-        return $employe_company == Company::requireLoggedInCompany()->id;
+        return true;
     }
 
     /**
@@ -26,6 +24,10 @@ class UpdateEmployeeRequest extends FormRequest
     public function rules(): array
     {
         return [
+            "nom"=>"string",
+            "email"=>"string|nullable",
+            "telephone"=>"integer",
+            "sexe"=>"string|max:1"
             //
         ];
     }

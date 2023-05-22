@@ -6,12 +6,23 @@ use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Abonnement extends Model
 {
     use CrudTrait;
     use HasFactory;
 
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+
+    }
+    public function formule(): BelongsTo
+    {
+        return $this->belongsTo(Formule::class);
+
+    }
     /**
      * @noinspection PhpUnused
      */
