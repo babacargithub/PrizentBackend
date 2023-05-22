@@ -17,7 +17,15 @@ class CompanyFactory extends Factory
      */
     public function definition(): array
     {
-        return [""
+        return [
+            "nom" => $this->faker->company(),
+            "telephone" => intval("77".$this->faker->numberBetween(1111111,9999999)),
+            "email" => $this->faker->email(),
+            "longitude" => $this->faker->longitude(),
+            "latitude" => $this->faker->latitude(),
+            "adresse" => $this->faker->address(),
+            "logo" => $this->faker->url(),
+            "region" => $this->faker->word()
             //
         ];
     }

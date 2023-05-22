@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\Employe;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Employe>
+ * @extends Factory<Employe>
  */
 class EmployeFactory extends Factory
 {
@@ -14,9 +15,14 @@ class EmployeFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    public function definition()
+    public function definition(): array
     {
         return [
+            "nom" => $this->faker->lastName(),
+            "email" => $this->faker->email(),
+            "telephone" => intval("77".$this->faker->numberBetween(1111111,9999999)),
+            "sexe" => $this->faker->randomLetter(),
+            "prenom" => $this->faker->firstName()
             //
         ];
     }

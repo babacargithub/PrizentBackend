@@ -51,9 +51,8 @@ class Company extends Model
         }
         return $company;
     }
-
     public function hasActiveSubscription(): bool
     {
-        return $this->abonnemen != null && $this->abonnement->isActive();
+        return $this->abonnement != null && $this->abonnement->isActive();
     }
 }
