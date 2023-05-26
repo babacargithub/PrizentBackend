@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\JourneeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +34,7 @@ Route::post('/login', function (Request $request){
 
 });
 Route::middleware("auth:sanctum")->group(function() {
+    Route::get("pointages/{date}",[JourneeController::class,"pointages"]);
     Route::resource('employes', EmployeeController::class);
     Route::resource('appareils', DeviceController::class,["only" => "destroy"]);
 });

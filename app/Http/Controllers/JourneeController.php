@@ -1,86 +1,35 @@
-<?php
+<?php /** @noinspection UnknownColumnInspection */
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreJourneeRequest;
-use App\Http\Requests\UpdateJourneeRequest;
+use App\Http\Resources\EntreeResource;
+use App\Http\Resources\SortieResource;
+use App\Models\Company;
+use App\Models\Entree;
 use App\Models\Journee;
+use App\Models\Sortie;
+use Carbon\Carbon;
 
 class JourneeController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreJourneeRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreJourneeRequest $request)
-    {
-        //
-    }
-
-    /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Journee  $journee
-     * @return \Illuminate\Http\Response
+     * @param Carbon $date
+     * @return array
      */
-    public function show(Journee $journee)
+    public function pointages($date)
     {
         //
+        $date = Carbon::create($date);
+        $journee = Journee::where("calendrier",$date->toDateString())->first();
+        if ($journee != null) {
+            $entrees = EntreeResource::collection(Entree::where("journee_id", $journee->id)->whereRelation("employe", "company_id", "=", Company::requireLoggedInCompany()->id)->get());
+            $sorties = SortieResource::collection(Entree::where("journee_id", $journee->id)->whereRelation("employe", "company_id", "=", Company::requireLoggedInCompany()->id)->get());
+            return ["journee" => $journee, "sorties" => $sorties, "entrees" => $entrees];
+        }
+        return [];
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Journee  $journee
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Journee $journee)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateJourneeRequest  $request
-     * @param  \App\Models\Journee  $journee
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateJourneeRequest $request, Journee $journee)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Journee  $journee
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Journee $journee)
-    {
-        //
-    }
 }

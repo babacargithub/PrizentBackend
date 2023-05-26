@@ -4,23 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
-use App\Http\Resources\EmployeResource;
+use App\Models\Appareil;
 use App\Models\Company;
 use App\Models\Employe;
-use Illuminate\Http\Resources\Json\JsonResource;
+use App\Models\HoraireEmploye;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Response;
+use LaravelIdea\Helper\App\Models\_IH_Employe_C;
 
 class EmployeeController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return JsonResource
+     * @return Employe[]|Collection|_IH_Employe_C
      */
     public function index()
     {
+        //todo un comment
 //        $this->authorize("viewAny", Employe::class);
-        return Company::requireLoggedInCompany()->employes()->with("devices")->get();
+        return Company::requireLoggedInCompany()->employes()
+            ->get();
 
     }
 
@@ -32,11 +36,14 @@ class EmployeeController extends Controller
      */
     public function store(StoreEmployeeRequest $request)
     {
-        //
+        $request->validate($request->rules());
         $employe = new Employe($request->input());
+
         $company = $this->requireUserAccountOfLoggedInCompany();
         $employe->company()->associate($company);
         $employe->save();
+        $employe->horaires()->createMany($request->input()["horaires"]);
+
         return  $employe;
 
     }
@@ -51,7 +58,10 @@ class EmployeeController extends Controller
     {
         //todo uncomment
 //        $this->authorize("view", $employe);
-       return $employe;
+        $employe->load("horaires");
+        $employe->load("appareils");
+        $employe->appareils()->get();
+        return $employe;
     }
 
 
@@ -67,10 +77,16 @@ class EmployeeController extends Controller
     {
         //todo uncomment later
 //        $this->authorize("update",$employe);
+        $request->validate($request->rules());
+        $employe->update($request->input());
+        $horaires = $request->input()["horaires"];
+        foreach ($horaires as $horaire) {
+            HoraireEmploye::where("id",$horaire["id"])->update($horaire);
+//          $employe->horaires()->update($horaire);
+        }
 
-            $employe->update($request->input());
 
-         return  $employe;
+        return  $employe;
 
     }
 

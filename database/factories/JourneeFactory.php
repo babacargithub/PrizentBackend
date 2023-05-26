@@ -15,10 +15,10 @@ class JourneeFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    public function definition()
+    public function definition(): array
     {
         return [
-            "name" => "Journé du xjxj",
+            "name" => "Journé du xjxj ".$this->faker->word(),
             "calendrier" => Carbon::today()->toDate(),
             "ferie" => false
 

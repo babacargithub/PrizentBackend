@@ -14,10 +14,13 @@ class QrCodeFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    public function definition()
+    public function definition(): array
     {
         return [
-            //
+            "nom" => $this->faker->company(),
+            "latitude" => $this->faker->latitude(),
+            "longitude" => $this->faker->longitude(),
+            "disabled" => false
         ];
     }
 }

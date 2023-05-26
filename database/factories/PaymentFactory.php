@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\Payment;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Payment>
+ * @extends Factory<Payment>
  */
 class PaymentFactory extends Factory
 {
@@ -14,9 +15,11 @@ class PaymentFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    public function definition()
+    public function definition(): array
     {
         return [
+            "paye_par" => "Wave",
+            "montant" => $this->faker->numberBetween(20000,50000),
             //
         ];
     }

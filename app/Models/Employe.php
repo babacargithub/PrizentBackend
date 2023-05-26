@@ -21,7 +21,7 @@ class Employe extends Model
 
     }
 
-    public function devices(): HasMany
+    public function appareils(): HasMany
     {
         return $this->hasMany(Appareil::class);
 

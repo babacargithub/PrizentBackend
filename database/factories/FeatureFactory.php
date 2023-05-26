@@ -14,9 +14,11 @@ class FeatureFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    public function definition()
+    public function definition(): array
     {
         return [
+            "constant_name" => $this->faker->unique()->word(),
+            "public_name" => $this->faker->unique()->word(),
             //
         ];
     }

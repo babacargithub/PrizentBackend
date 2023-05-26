@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -14,9 +15,12 @@ class AppareilFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    public function definition()
+    public function definition(): array
     {
         return [
+            "name" => "Téléphone de ".$this->faker->company(),
+            "uuid" => $this->faker->uuid(),
+            "last_active" => Carbon::now()
             //
         ];
     }

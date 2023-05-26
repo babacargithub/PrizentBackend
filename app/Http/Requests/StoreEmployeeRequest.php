@@ -24,6 +24,7 @@ class StoreEmployeeRequest extends FormRequest
     public function rules(): array
     {
         return [
+            "prenom"=>"string",
             "nom"=>"string",
             "email"=>"string|nullable",
             "telephone"=>"integer",
