@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePaymentAbonnementRequest;
-use App\Http\Requests\UpdatePaymentAbonnementRequest;
+use App\Models\Company;
 use App\Models\Payment;
 
 class PaymentAbonnementController extends Controller
@@ -11,76 +11,39 @@ class PaymentAbonnementController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Payment[]
      */
     public function index()
     {
         //
+        return Payment::with("abonnement")->whereRelation("abonnement","company_id","=", Company::requireLoggedInCompany())->get();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StorePaymentAbonnementRequest  $request
-     * @return \Illuminate\Http\Response
+     * @param StorePaymentAbonnementRequest $request
+     * @return Payment
      */
     public function store(StorePaymentAbonnementRequest $request)
     {
         //
+        $payement = new Payment($request->input());
+        $payement->save();
+        return  $payement;
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Payment  $paymentAbonnement
-     * @return \Illuminate\Http\Response
+     * @param Payment $paymentAbonnement
+     * @return Payment
      */
     public function show(Payment $paymentAbonnement)
     {
         //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Payment  $paymentAbonnement
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Payment $paymentAbonnement)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdatePaymentAbonnementRequest  $request
-     * @param  \App\Models\Payment  $paymentAbonnement
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdatePaymentAbonnementRequest $request, Payment $paymentAbonnement)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Payment  $paymentAbonnement
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Payment $paymentAbonnement)
-    {
-        //
+        return $paymentAbonnement;
     }
 }

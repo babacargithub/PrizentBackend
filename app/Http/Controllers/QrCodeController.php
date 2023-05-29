@@ -1,86 +1,80 @@
-<?php
+<?php /** @noinspection UnknownColumnInspection */
 
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreQrCodeRequest;
 use App\Http\Requests\UpdateQrCodeRequest;
+use App\Models\Company;
 use App\Models\QrCode;
+use Illuminate\Http\Response;
 
 class QrCodeController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return QrCode[]
      */
     public function index()
     {
         //
+        return QrCode::where("company_id", Company::requireLoggedInCompany()->id)->get();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StoreQrCodeRequest  $request
-     * @return \Illuminate\Http\Response
+     * @param StoreQrCodeRequest $request
+     * @return Response
      */
     public function store(StoreQrCodeRequest $request)
     {
         //
+        $request->validate($request->rules());
+        return  QrCode::create($request->input());
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\QrCode  $qrCode
-     * @return \Illuminate\Http\Response
+     * @param QrCode $qrCode
+     * @return QrCode
      */
     public function show(QrCode $qrCode)
     {
         //
+        return $qrCode;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\QrCode  $qrCode
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(QrCode $qrCode)
-    {
-        //
-    }
+
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\UpdateQrCodeRequest  $request
-     * @param  \App\Models\QrCode  $qrCode
-     * @return \Illuminate\Http\Response
+     * @param UpdateQrCodeRequest $request
+     * @param QrCode $qrCode
+     * @return QrCode
      */
     public function update(UpdateQrCodeRequest $request, QrCode $qrCode)
     {
         //
+        $request->validate($request->rules());
+          $qrCode->update($request->input());
+          return  $qrCode;
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\QrCode  $qrCode
-     * @return \Illuminate\Http\Response
+     * @param QrCode $qrCode
+     * @return Response
      */
     public function destroy(QrCode $qrCode)
     {
         //
+        $qrCode->delete();
+        return new Response("deleted");
     }
 }

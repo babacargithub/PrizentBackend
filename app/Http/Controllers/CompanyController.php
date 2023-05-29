@@ -2,26 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\CompanyResource;
+use App\Http\Requests\UpdateCompanyRequest;
 use App\Models\Company;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class CompanyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return AnonymousResourceCollection
-     */
-    public function index()
-    {
-        //
-
-        return CompanyResource::collection(Company::all());
-    }
-
-
-
     /**
      * Display the specified resource.
      *
@@ -30,8 +15,15 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
-        //
+        $company->load("employes");
+        $company->load("abonnement");
+        $company->load("QrCodes");
         return $company;
+    }
+
+    public function update(Company $company, UpdateCompanyRequest $updateCompanyRequest)
+    {
+        return $company->update($updateCompanyRequest->validated());
     }
 
 

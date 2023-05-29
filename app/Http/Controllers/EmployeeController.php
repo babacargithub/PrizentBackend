@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
-use App\Models\Appareil;
 use App\Models\Company;
 use App\Models\Employe;
 use App\Models\HoraireEmploye;

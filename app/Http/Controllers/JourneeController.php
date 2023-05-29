@@ -7,7 +7,6 @@ use App\Http\Resources\SortieResource;
 use App\Models\Company;
 use App\Models\Entree;
 use App\Models\Journee;
-use App\Models\Sortie;
 use Carbon\Carbon;
 
 class JourneeController extends Controller
@@ -15,7 +14,6 @@ class JourneeController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param Carbon $date
      * @return array
      */
     public function pointages($date)

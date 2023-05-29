@@ -1,8 +1,9 @@
 <?php
 
 use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\AppareilController;
 use App\Http\Controllers\JourneeController;
+use App\Models\QrCode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -36,5 +37,6 @@ Route::post('/login', function (Request $request){
 Route::middleware("auth:sanctum")->group(function() {
     Route::get("pointages/{date}",[JourneeController::class,"pointages"]);
     Route::resource('employes', EmployeeController::class);
-    Route::resource('appareils', DeviceController::class,["only" => "destroy"]);
+    Route::resource('qr_code', QrCode::class);
+    Route::resource('appareils', AppareilController::class,["only" => "destroy"]);
 });

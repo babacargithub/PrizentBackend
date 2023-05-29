@@ -3,84 +3,41 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreSortieRequest;
-use App\Http\Requests\UpdateSortieRequest;
+use App\Models\Journee;
 use App\Models\Sortie;
+use Carbon\Carbon;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class SortieController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StoreSortieRequest  $request
-     * @return \Illuminate\Http\Response
+     * @param StoreSortieRequest $request
+     * @return Sortie
+     * @noinspection UnknownColumnInspection
      */
     public function store(StoreSortieRequest $request)
     {
-        //
+        $sortie = new Sortie($request->validated());
+        $sortie->journee = Journee::where("calendrier","=", Carbon::today()->toDateString());
+        $sortie->scanned_at = Carbon::now()->toTimeString();
+        $sortie->calculerPonctualite();
+
+        return $sortie;
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Sortie  $sortie
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Sortie $sortie)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Sortie  $sortie
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Sortie $sortie)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateSortieRequest  $request
-     * @param  \App\Models\Sortie  $sortie
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateSortieRequest $request, Sortie $sortie)
-    {
-        //
-    }
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Sortie  $sortie
-     * @return \Illuminate\Http\Response
+     * @param Sortie $sortie
+     * @return Response
      */
     public function destroy(Sortie $sortie)
     {
         //
+        $sortie->delete();
+        return  (new Response("deleted"))->setStatusCode(ResponseAlias::HTTP_NO_CONTENT);
     }
 }

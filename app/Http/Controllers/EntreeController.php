@@ -3,84 +3,40 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreEntreeRequest;
-use App\Http\Requests\UpdateEntreeRequest;
 use App\Models\Entree;
+use App\Models\Journee;
+use Carbon\Carbon;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class EntreeController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreEntreeRequest  $request
-     * @return \Illuminate\Http\Response
+     * @param StoreEntreeRequest $request
+     * @return Entree
+     * @noinspection UnknownColumnInspection
      */
     public function store(StoreEntreeRequest $request)
     {
         //
-    }
+        $entree = new Entree($request->validated());
+        $entree->journee = Journee::where("calendrier","=", Carbon::today()->toDateString());
+        $entree->scanned_at = Carbon::now()->toTimeString();
+        $entree->calculerPonctualite();
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Entree  $entree
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Entree $entree)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Entree  $entree
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Entree $entree)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateEntreeRequest  $request
-     * @param  \App\Models\Entree  $entree
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateEntreeRequest $request, Entree $entree)
-    {
-        //
+        return $entree;
     }
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Entree  $entree
-     * @return \Illuminate\Http\Response
+     * @param Entree $entree
+     * @return Response
      */
     public function destroy(Entree $entree)
     {
         //
+        $entree->delete();
+        return  (new Response("deleted"))->setStatusCode(ResponseAlias::HTTP_NO_CONTENT);
     }
 }
