@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\AppareilController;
+use App\Http\Controllers\EntreeController;
 use App\Http\Controllers\JourneeController;
+use App\Http\Controllers\SortieController;
 use App\Models\QrCode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -37,6 +39,9 @@ Route::post('/login', function (Request $request){
 Route::middleware("auth:sanctum")->group(function() {
     Route::get("pointages/{date}",[JourneeController::class,"pointages"]);
     Route::resource('employes', EmployeeController::class);
+    Route::get('employes/{employe}/rapport/{dateStart}/{dateEnd}', [EmployeeController::class,"rapport"]);
     Route::resource('qr_code', QrCode::class);
     Route::resource('appareils', AppareilController::class,["only" => "destroy"]);
+    Route::resource('entrees', EntreeController::class,["only" => "store"]);
+    Route::resource('sorties', SortieController::class,["only" => "store"]);
 });

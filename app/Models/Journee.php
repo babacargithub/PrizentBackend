@@ -10,6 +10,7 @@ class Journee extends Model
 {
     use HasFactory;
     public $timestamps = false;
+    protected $fillable = ["calendrier","name","ferie"];
     protected $dates = ["calendrier"];
 
 

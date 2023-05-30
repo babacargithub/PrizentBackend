@@ -4,19 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
+use App\Http\Resources\RapportEmployeItemResource;
 use App\Models\Company;
 use App\Models\Employe;
+use App\Models\Entree;
 use App\Models\HoraireEmploye;
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\Journee;
+use App\Models\Sortie;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Response;
-use LaravelIdea\Helper\App\Models\_IH_Employe_C;
 
 class EmployeeController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return Employe[]|Collection|_IH_Employe_C
+     * @return Employe[]
      */
     public function index()
     {
@@ -26,10 +29,54 @@ class EmployeeController extends Controller
             ->get();
 
     }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Employe[]
+     */
+    public function rapport(Employe $employe, $dateStart, $dateEnd)
+    {
+        //todo un comment
+//        $this->authorize("viewAny", Employe::class);
+        $entreeQuery = Entree::where("employe_id", $employe->id);
+        $entrees = $entreeQuery
+            ->whereRelation("employe","company_id","=",Company::requireLoggedInCompany()->id)
+            ->whereHas("journee",function (Builder $query) use ($dateStart, $dateEnd){
+                $query->whereBetween("calendrier", [$dateStart, $dateEnd]); }
+            )->get();
+        $sortieQuery = Sortie::where("employe_id", $employe->id);
+        $sorties = $sortieQuery
+            ->whereRelation("employe","company_id","=",Company::requireLoggedInCompany()->id)
+            ->whereHas("journee",function (Builder $query) use ($dateStart, $dateEnd){
+                $query->whereBetween("calendrier", [$dateStart, $dateEnd]); }
+            )->get();
+        $totalRetards = $entreeQuery->whereRelation("employe","company_id","=",Company::requireLoggedInCompany()->id)
+            ->whereHas("journee",function (Builder $query) use ($dateStart, $dateEnd){
+                $query->whereBetween("calendrier", [$dateStart, $dateEnd]); }
+            )->sum("ponctualite");
+        $totalSupplement = $sortieQuery->whereRelation("employe","company_id","=",Company::requireLoggedInCompany()->id)
+            ->whereHas("journee",function (Builder $query) use ($dateStart, $dateEnd){
+                $query->whereBetween("calendrier", [$dateStart, $dateEnd]); }
+            )->sum("ponctualite");
+        $journeesIds = Journee::select('id')->whereBetween("calendrier",[$dateStart,$dateEnd])->whereFerie(false)->get()->toArray();
+        $joursAbsentes =  0;
+        foreach ($journeesIds as $journeesId) {
+            $entree = Entree::where("employe_id", $employe->id)
+                ->where("journee_id",intval($journeesId["id"]))->first();
+            if ($entree == null){
+                $joursAbsentes = $joursAbsentes + 1;
+            }
+        }
+        return ["entrees"=>RapportEmployeItemResource::collection($entrees),
+            "sorties"=>RapportEmployeItemResource::collection($sorties),
+            "total_retards"=> intval($totalRetards),
+            "total_absents"=>$joursAbsentes,
+            "total_supplement"=>intval($totalSupplement)];
+
+    }
 
     /**
      * Store a newly created resource in storage.
-     *
      * @param StoreEmployeeRequest $request
      * @return Employe
      */
@@ -37,7 +84,6 @@ class EmployeeController extends Controller
     {
         $request->validate($request->rules());
         $employe = new Employe($request->input());
-
         $company = $this->requireUserAccountOfLoggedInCompany();
         $employe->company()->associate($company);
         $employe->save();
@@ -102,4 +148,5 @@ class EmployeeController extends Controller
         $employe->delete();
         return  new Response('deleted');
     }
+
 }

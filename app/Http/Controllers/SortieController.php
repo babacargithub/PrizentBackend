@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreSortieRequest;
+use App\Models\Entree;
 use App\Models\Journee;
 use App\Models\Sortie;
 use Carbon\Carbon;
@@ -20,10 +21,13 @@ class SortieController extends Controller
      */
     public function store(StoreSortieRequest $request)
     {
-        $sortie = new Sortie($request->validated());
-        $sortie->journee = Journee::where("calendrier","=", Carbon::today()->toDateString());
+
+        $sortie = new Sortie($request->input());
+        $journee = Journee::firstOrCreate(["calendrier"=> Carbon::today()->toDateString(), "name" => Carbon::now()->format("d-m-Y")]);
+        $sortie->journee()->associate($journee);
         $sortie->scanned_at = Carbon::now()->toTimeString();
         $sortie->calculerPonctualite();
+        $sortie->save();
 
         return $sortie;
     }

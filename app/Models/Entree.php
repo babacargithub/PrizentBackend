@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Entree extends Model
 {
     use HasFactory;
-
+    protected $fillable = ["scanned_at","qr_code_id","employe_id","journee_id"];
     public function employe(): BelongsTo
     {
         return $this->belongsTo(Employe::class);
@@ -27,7 +27,6 @@ class Entree extends Model
 
     }
 
-    /** @noinspection UnknownColumnInspection */
     public function calculerPonctualite() : self {
         $day = $this->journee->calendrier->dayOfWeekIso;
         $horaire = $this->employe->horaires()->where("jour",$day)->first();

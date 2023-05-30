@@ -24,7 +24,8 @@ class StoreEntreeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "qr_code_id"=>"integer"
+            "qr_code_id"=>"required|integer",
+            "employe_id"=>"required|integer"
         ];
     }
 }

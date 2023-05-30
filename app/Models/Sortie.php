@@ -14,8 +14,7 @@ class Sortie extends Model
 {
     use HasFactory;
 
-
-
+    protected $fillable = ["scanned_at","qr_code_id","employe_id","journee_id"];
 
     public function employe(): BelongsTo
     {
@@ -32,7 +31,7 @@ class Sortie extends Model
         return $this->belongsTo(QrCode::class);
 
     }
-    /** @noinspection UnknownColumnInspection */
+
     public function calculerPonctualite() : self {
         $day = $this->journee->calendrier->dayOfWeekIso;
         $horaire = $this->employe->horaires()->where("jour",$day)->first();

@@ -15,15 +15,15 @@ class EntreeController extends Controller
      * Store a newly created resource in storage.
      * @param StoreEntreeRequest $request
      * @return Entree
-     * @noinspection UnknownColumnInspection
      */
     public function store(StoreEntreeRequest $request)
     {
-        //
         $entree = new Entree($request->validated());
-        $entree->journee = Journee::where("calendrier","=", Carbon::today()->toDateString());
+        $journee = Journee::firstOrCreate(["calendrier"=> Carbon::today()->toDateString(), "name" => Carbon::now()->format("d-m-Y")]);
+        $entree->journee()->associate($journee);
         $entree->scanned_at = Carbon::now()->toTimeString();
         $entree->calculerPonctualite();
+        $entree->save();
 
         return $entree;
     }
