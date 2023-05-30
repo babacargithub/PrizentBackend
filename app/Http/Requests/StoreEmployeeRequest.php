@@ -24,11 +24,11 @@ class StoreEmployeeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "prenom"=>"string",
-            "nom"=>"string",
-            "email"=>"string|nullable",
-            "telephone"=>"integer",
-            "sexe"=>"string|max:1"
+            "prenom"=>"required|string|min:3",
+            "nom"=>"required|string|min:2",
+            "email"=>"email|nullable",
+            "telephone"=>"integer|unique:employes|min_digits:9|max_digits:9",
+            "sexe"=>"required|string|max:1"
             //
         ];
     }

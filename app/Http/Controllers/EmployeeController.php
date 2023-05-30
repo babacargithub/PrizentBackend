@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
+use App\Http\Resources\EmployeResource;
 use App\Http\Resources\RapportEmployeItemResource;
 use App\Models\Company;
 use App\Models\Employe;
@@ -12,6 +13,7 @@ use App\Models\HoraireEmploye;
 use App\Models\Journee;
 use App\Models\Sortie;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
 class EmployeeController extends Controller
@@ -19,14 +21,14 @@ class EmployeeController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return Employe[]
+     * @return AnonymousResourceCollection
      */
     public function index()
     {
         //todo un comment
 //        $this->authorize("viewAny", Employe::class);
-        return Company::requireLoggedInCompany()->employes()
-            ->get();
+        return EmployeResource::collection(Company::requireLoggedInCompany()->employes()
+            ->get());
 
     }
     /**
@@ -130,11 +132,9 @@ class EmployeeController extends Controller
 //          $employe->horaires()->update($horaire);
         }
 
-
         return  $employe;
 
     }
-
     /**
      * Remove the specified resource from storage.
      *

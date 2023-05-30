@@ -11,7 +11,7 @@ class HoraireEmploye extends Model
     public $timestamps = false;
     protected $table = "horaires_employes";
     use HasFactory;
-    protected $fillable = ["jour","sortie","entree"];
+    protected $fillable = ["jour","sortie","entree","repos"];
     public function employe(): BelongsTo
     {
         return $this->belongsTo(Employe::class);
