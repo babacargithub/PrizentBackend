@@ -27,7 +27,7 @@ class EmployeeController extends Controller
     {
         //todo un comment
 //        $this->authorize("viewAny", Employe::class);
-        return EmployeResource::collection(Company::requireLoggedInCompany()->employes()
+        return EmployeResource::collection(Company::requireLoggedInCompany()->employes()->orderBy("prenom")
             ->get());
 
     }
@@ -52,14 +52,17 @@ class EmployeeController extends Controller
             ->whereHas("journee",function (Builder $query) use ($dateStart, $dateEnd){
                 $query->whereBetween("calendrier", [$dateStart, $dateEnd]); }
             )->get();
+
         $totalRetards = $entreeQuery->whereRelation("employe","company_id","=",Company::requireLoggedInCompany()->id)
             ->whereHas("journee",function (Builder $query) use ($dateStart, $dateEnd){
                 $query->whereBetween("calendrier", [$dateStart, $dateEnd]); }
-            )->sum("ponctualite");
+            )->where("ponctualite",'<',0)
+            ->sum("ponctualite");
         $totalSupplement = $sortieQuery->whereRelation("employe","company_id","=",Company::requireLoggedInCompany()->id)
             ->whereHas("journee",function (Builder $query) use ($dateStart, $dateEnd){
                 $query->whereBetween("calendrier", [$dateStart, $dateEnd]); }
-            )->sum("ponctualite");
+            )->where("ponctualite",'>=',0)
+            ->sum("ponctualite");
         $journeesIds = Journee::select('id')->whereBetween("calendrier",[$dateStart,$dateEnd])->whereFerie(false)->get()->toArray();
         $joursAbsentes =  0;
         foreach ($journeesIds as $journeesId) {
@@ -69,11 +72,14 @@ class EmployeeController extends Controller
                 $joursAbsentes = $joursAbsentes + 1;
             }
         }
-        return ["entrees"=>RapportEmployeItemResource::collection($entrees),
+        return [
+            "employe"=>new EmployeResource($employe),
+            "periode"=>'du '.$dateStart.' au '.$dateEnd,
+            "entrees"=>RapportEmployeItemResource::collection($entrees),
             "sorties"=>RapportEmployeItemResource::collection($sorties),
-            "total_retards"=> intval($totalRetards),
-            "total_absents"=>$joursAbsentes,
-            "total_supplement"=>intval($totalSupplement)];
+            "retard"=> intval($totalRetards),
+            "absence"=>$joursAbsentes,
+            "supplement"=>intval($totalSupplement)];
 
     }
 

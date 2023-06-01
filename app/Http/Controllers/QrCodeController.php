@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreQrCodeRequest;
 use App\Http\Requests\UpdateQrCodeRequest;
+use App\Http\Resources\QrCodeResource;
 use App\Models\Company;
 use App\Models\QrCode;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
 class QrCodeController extends Controller
@@ -13,12 +15,12 @@ class QrCodeController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return QrCode[]
+     * @return AnonymousResourceCollection
      */
     public function index()
     {
         //
-        return QrCode::where("company_id", Company::requireLoggedInCompany()->id)->get();
+        return QrCodeResource::collection(QrCode::where("company_id", Company::requireLoggedInCompany()->id)->get());
     }
 
 
@@ -27,13 +29,15 @@ class QrCodeController extends Controller
      * Store a newly created resource in storage.
      *
      * @param StoreQrCodeRequest $request
-     * @return Response
+     * @return QrCode
      */
     public function store(StoreQrCodeRequest $request)
     {
-        //
-        $request->validate($request->rules());
-        return  QrCode::create($request->input());
+        $QrCode = new  QrCode($request->input());
+        $QrCode->company()->associate(Company::requireLoggedInCompany());
+        $QrCode->save();
+
+        return  $QrCode;
     }
 
     /**
@@ -44,11 +48,8 @@ class QrCodeController extends Controller
      */
     public function show(QrCode $qrCode)
     {
-        //
         return $qrCode;
     }
-
-
 
     /**
      * Update the specified resource in storage.
@@ -60,7 +61,6 @@ class QrCodeController extends Controller
     public function update(UpdateQrCodeRequest $request, QrCode $qrCode)
     {
         //
-        $request->validate($request->rules());
           $qrCode->update($request->input());
           return  $qrCode;
     }

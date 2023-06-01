@@ -19,8 +19,10 @@ return new class extends Migration
             $table->string('nom');
             $table->bigInteger('latitude');
             $table->bigInteger('longitude');
+            $table->tinyInteger("type")->unsigned()->nullable(false);
             $table->boolean('disabled')->default(false);
             $table->timestamps();
+            $table->softDeletes();
 
         });
     }

@@ -11,9 +11,9 @@ class StoreQrCodeRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,9 +21,13 @@ class StoreQrCodeRequest extends FormRequest
      *
      * @return array<string, mixed>
      */
-    public function rules()
+    public function rules(): array
     {
         return [
+            "nom"=>"required|string",
+            "latitude"=>"required",
+            "longitude"=>"required",
+            "type"=>"required|integer"
             //
         ];
     }

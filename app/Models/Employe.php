@@ -32,4 +32,8 @@ class Employe extends Model
         return $this->hasMany(HoraireEmploye::class);
 
     }
+    public function getFullNameAttribue(): string{
+
+        return $this->attributes["prenom"].' '.$this->attributes["nom"];
+    }
 }

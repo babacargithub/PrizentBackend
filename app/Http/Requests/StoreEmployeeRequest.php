@@ -26,7 +26,7 @@ class StoreEmployeeRequest extends FormRequest
         return [
             "prenom"=>"required|string|min:3",
             "nom"=>"required|string|min:2",
-            "email"=>"email|nullable",
+            "email"=>"email|nullable|unique:employes",
             "telephone"=>"integer|unique:employes|min_digits:9|max_digits:9",
             "sexe"=>"required|string|max:1"
             //

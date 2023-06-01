@@ -25,8 +25,9 @@ class RapportEmployeItemResource extends JsonResource
      */
     public function toArray($request): array|JsonSerializableAlias|Arrayable
     {
-        return ["journee"=> $this->journee->calendrier->format('d-m-Y'),
-            "scanned_at"=>$this->scanned_at,
+        return [
+            "journee"=> $this->journee->calendrier->format('d-m-Y'),
+            "scanned_at"=>Carbon::createFromFormat('H:i:s',$this->scanned_at)->format('H:i'),
             "ponctualite"=>$this->ponctualite
             ];
     }

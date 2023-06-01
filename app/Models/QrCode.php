@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class QrCode extends Model
 {
     use HasFactory;
+    const TYPE_ENTREE = 1;
+    const TYPE_SORTIE = 2;
+    protected $fillable = ["nom","longitude","latitude","type"];
 
     public function company(): BelongsTo
     {
