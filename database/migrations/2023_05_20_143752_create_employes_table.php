@@ -21,6 +21,7 @@ return new class extends Migration
             $table->boolean('disabled')->default(false);
             $table->string('email', 256)->unique()->nullable();
             $table->integer('telephone')->unique();
+            $table->boolean('pointeur')->default(false);
             $table->timestamps();
         });
     }

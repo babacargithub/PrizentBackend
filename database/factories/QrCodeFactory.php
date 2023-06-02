@@ -20,7 +20,8 @@ class QrCodeFactory extends Factory
             "nom" => $this->faker->company(),
             "latitude" => $this->faker->latitude(),
             "longitude" => $this->faker->longitude(),
-            "disabled" => false
+            "disabled" => false,
+            "type" => 1,
         ];
     }
 }

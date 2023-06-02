@@ -7,6 +7,8 @@ use App\Http\Controllers\EntreeController;
 use App\Http\Controllers\JourneeController;
 use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\SortieController;
+use App\Models\Company;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,7 +32,9 @@ Route::post('/login', function (Request $request){
         'password' => ['required'],
     ]);
     if (Auth::attempt($credentials)) {
-        return response(request()->user()->createToken("name"));
+        $token = request()->user()->createToken("name", [], Carbon::now()->addDays(30));
+        $company  = Company::where('user_id', request()->user()->id)->first();
+        return response(["token"=>$token,"company"=>$company]);
     }else{
 
         return response("Invalid credentials")->setStatusCode(401);
@@ -41,6 +45,9 @@ Route::middleware("auth:sanctum")->group(function() {
     Route::get("pointages/{date}",[JourneeController::class,"pointages"]);
     Route::get('employes/{employe}/rapport/{dateStart}/{dateEnd}', [EmployeeController::class,"rapport"]);
     Route::get('companies/index', [CompanyController::class,"abonnementShow"]);
+    Route::get('companies/show', [CompanyController::class,"show"]);
+    Route::get('companies/pointeurs', [CompanyController::class,"pointeurs"]);
+    Route::put('companies/params', [CompanyController::class,"updateParams"]);
     Route::resource('employes', EmployeeController::class);
     Route::resource('qr_codes', QrCodeController::class);
     Route::resource('appareils', AppareilController::class,["only" => "destroy"]);

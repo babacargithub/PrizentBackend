@@ -6,6 +6,7 @@ use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -36,9 +37,23 @@ class Company extends Model
 
     }
 
-    public function QrCodes(): HasMany
+    public function qrCodes(): HasMany
     {
         return $this->hasMany(QrCode::class);
+
+    }
+
+    public function params(): BelongsToMany
+    {
+        return $this->belongsToMany(Params::class)
+            ->using(CompanyParams::class)
+            ->withPivot("enabled");
+
+
+    }
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class);
 
     }
 

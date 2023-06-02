@@ -26,4 +26,16 @@ class EmployeFactory extends Factory
             //
         ];
     }
+    /**
+     * Indicate that the model's email address should be unverified.
+     *
+     * @return static
+     */
+    public function pointeur(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            ['pointeur' => false],
+            ['pointeur' => true],
+        ]);
+    }
 }

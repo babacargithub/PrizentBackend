@@ -11,11 +11,13 @@ use App\Models\Feature;
 use App\Models\Formule;
 use App\Models\HoraireEmploye;
 use App\Models\Journee;
+use App\Models\Params;
 use App\Models\Payment;
 use App\Models\QrCode;
 use App\Models\Sortie;
 use App\Models\User;
 use Artisan;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Seeder;
 
 class CompanySeeder extends Seeder
@@ -35,11 +37,15 @@ class CompanySeeder extends Seeder
         $company->user()->associate($user);
         $company->save();
         $journee = Journee::factory()->create();
-        $formule = Formule::factory()->create();
-        $formule->features()->saveMany(Feature::factory()->count(20)->make());
+        $formules = Formule::factory()->count(5)->create();
+        foreach ($formules as $formule) {
+            $formule->features()->saveMany(Feature::factory()->count(8)->make());
+        }
+        $company->params()->saveMany(Params::factory()->count(5)->create());
+        $company->users()->saveMany(User::factory()->count(10)->create());
         $abonnement = Abonnement::factory()->make();
         $abonnement->company()->associate($company);
-        $abonnement->formule()->associate($formule);
+        $abonnement->formule()->associate(Formule::first());
         $abonnement->save();
         $abonnement->payments()->saveMany(Payment::factory()->count(20)->make());
 
@@ -51,9 +57,13 @@ class CompanySeeder extends Seeder
             $horaire = $horairesFactory->definition();
             $horaires[] = $horaire;
         }
+        $employes = Employe::factory()->count(20)
+            ->state(new Sequence(
+                ['pointeur' => false],
+                ['pointeur' => true],
+            ))->make();
+        foreach ($employes as $employe) {
 
-        for ($i=0; $i < 20; $i++) {
-            $employe = Employe::factory()->make();
             $company->employes()->save($employe);
             $horairesArray = [];
             for ($j = 0; $j < 7; $j++) {
@@ -61,21 +71,21 @@ class CompanySeeder extends Seeder
             }
             $employe->horaires()->saveMany($horairesArray);
 
-        $employe->appareils()->saveMany(Appareil::factory()->count(2)->make());
-       // entrées
-        $entree = Entree::factory()->make();
-        $entree->employe()->associate($employe);
-        $entree->journee()->associate($journee);
-        $entree->qrCode()->associate($qrCode);
-        $entree->calculerPonctualite();
-        $entree->save();
-        // sorties
-        $sortie = Sortie::factory()->make();
-        $sortie->employe()->associate($employe);
-        $sortie->journee()->associate($journee);
-        $sortie->qrCode()->associate($qrCode);
-        $sortie->calculerPonctualite();
-        $sortie->save();
+            $employe->appareils()->saveMany(Appareil::factory()->count(2)->make());
+            // entrées
+            $entree = Entree::factory()->make();
+            $entree->employe()->associate($employe);
+            $entree->journee()->associate($journee);
+            $entree->qrCode()->associate($qrCode);
+            $entree->calculerPonctualite();
+            $entree->save();
+            // sorties
+            $sortie = Sortie::factory()->make();
+            $sortie->employe()->associate($employe);
+            $sortie->journee()->associate($journee);
+            $sortie->qrCode()->associate($qrCode);
+            $sortie->calculerPonctualite();
+            $sortie->save();
 
         }
     }

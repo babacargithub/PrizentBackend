@@ -130,12 +130,14 @@ class EmployeeController extends Controller
     {
         //todo uncomment later
 //        $this->authorize("update",$employe);
-        $request->validate($request->rules());
         $employe->update($request->input());
-        $horaires = $request->input()["horaires"];
-        foreach ($horaires as $horaire) {
-            HoraireEmploye::where("id",$horaire["id"])->update($horaire);
-//          $employe->horaires()->update($horaire);
+
+        if (isset($request->input()["horaires"])) {
+            $horaires = $request->input()["horaires"];
+            foreach ($horaires as $horaire) {
+                HoraireEmploye::where("id", $horaire["id"])->update($horaire);
+                //          $employe->horaires()->update($horaire);
+            }
         }
 
         return  $employe;
