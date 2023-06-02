@@ -25,7 +25,7 @@ class QrCodeResource extends JsonResource
             "latitude"=>$this->latitude,
             "longitude"=>$this->longitude,
             "type"=>(string)$this->type,
-            "enabled"=>(bool) $this->disabled == false,
+            "disabled"=>$this->disabled,
             "qr_code_url"=>"https://app.prizent.pro/qr_code/".$this->id
 
         ];

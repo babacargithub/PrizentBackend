@@ -11,7 +11,8 @@ class QrCode extends Model
     use HasFactory;
     const TYPE_ENTREE = 1;
     const TYPE_SORTIE = 2;
-    protected $fillable = ["nom","longitude","latitude","type"];
+    protected $fillable = ["nom","longitude","latitude","type","disabled"];
+    protected $casts = ["disabled" => "boolean"];
 
     public function company(): BelongsTo
     {

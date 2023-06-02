@@ -48,6 +48,7 @@ Route::middleware("auth:sanctum")->group(function() {
     Route::get('companies/show', [CompanyController::class,"show"]);
     Route::get('companies/pointeurs', [CompanyController::class,"pointeurs"]);
     Route::put('companies/params', [CompanyController::class,"updateParams"]);
+    Route::put('companies/update', [CompanyController::class,"update"]);
     Route::resource('employes', EmployeeController::class);
     Route::resource('qr_codes', QrCodeController::class);
     Route::resource('appareils', AppareilController::class,["only" => "destroy"]);

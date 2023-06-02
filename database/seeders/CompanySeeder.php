@@ -41,7 +41,7 @@ class CompanySeeder extends Seeder
         foreach ($formules as $formule) {
             $formule->features()->saveMany(Feature::factory()->count(8)->make());
         }
-        $company->params()->saveMany(Params::factory()->count(5)->create());
+        $company->params()->saveMany(Params::factory()->count(20)->create());
         $company->users()->saveMany(User::factory()->count(10)->create());
         $abonnement = Abonnement::factory()->make();
         $abonnement->company()->associate($company);

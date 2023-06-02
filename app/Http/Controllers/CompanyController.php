@@ -45,9 +45,11 @@ class CompanyController extends Controller
 
     }
 
-    public function update(Company $company, UpdateCompanyRequest $updateCompanyRequest)
+    public function update( UpdateCompanyRequest $updateCompanyRequest)
     {
-        return $company->update($updateCompanyRequest->input());
+        $company = Company::requireLoggedInCompany();
+         $company->update($updateCompanyRequest->input());
+         return $company;
     }
 
     public function updateParams()

@@ -24,6 +24,7 @@ class UpdateQrCodeRequest extends FormRequest
     public function rules(): array
     {
         return [
+            "enabled"=>"boolean"
             //
         ];
     }
