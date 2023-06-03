@@ -24,7 +24,8 @@ class SortieResource extends JsonResource
      */
     public function toArray($request): array|JsonSerializableAlias|Arrayable
     {
-        return ["employe"=>$this->employe->prenom. ' '.$this->employe->nom,
+        return [
+            "employe"=>$this->employe,
             "scanned_at"=>Carbon::createFromFormat("H:m:s", $this->scanned_at)->format('H:m'),
             "ponctualite"=>$this->ponctualite
             ];

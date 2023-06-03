@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AbonnementController;
 use App\Http\Controllers\AppareilController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmployeeController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\EntreeController;
 use App\Http\Controllers\JourneeController;
 use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\SortieController;
+use App\Http\Middleware\CheckIfHasActiveSubscription;
 use App\Models\Company;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -41,17 +43,23 @@ Route::post('/login', function (Request $request){
     }
 
 });
-Route::middleware("auth:sanctum")->group(function() {
+Route::middleware(["auth:sanctum", CheckIfHasActiveSubscription::class])->group(function() {
     Route::get("pointages/{date}",[JourneeController::class,"pointages"]);
     Route::get('employes/{employe}/rapport/{dateStart}/{dateEnd}', [EmployeeController::class,"rapport"]);
-    Route::get('companies/index', [CompanyController::class,"abonnementShow"]);
-    Route::get('companies/show', [CompanyController::class,"show"]);
     Route::get('companies/pointeurs', [CompanyController::class,"pointeurs"]);
     Route::put('companies/params', [CompanyController::class,"updateParams"]);
     Route::put('companies/update', [CompanyController::class,"update"]);
+Route::get('companies/show', [CompanyController::class,"show"]);
     Route::resource('employes', EmployeeController::class);
     Route::resource('qr_codes', QrCodeController::class);
     Route::resource('appareils', AppareilController::class,["only" => "destroy"]);
     Route::resource('entrees', EntreeController::class,["only" => "store"]);
     Route::resource('sorties', SortieController::class,["only" => "store"]);
 });
+Route::middleware(["auth:sanctum"])->group(function() {
+    Route::get('companies/index', [CompanyController::class, "abonnementShow"]);
+    Route::post('company/abonner', [AbonnementController::class, "abonnerRequest"]);
+    Route::post('abonnement/{abonnement}/renouveler/initier', [AbonnementController::class, "renouveler"]);
+});
+
+

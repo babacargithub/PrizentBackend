@@ -2,85 +2,113 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreAbonnementRequest;
-use App\Http\Requests\UpdateAbonnementRequest;
+use App\Http\Requests\AbonnementRequest;
+use App\Http\Requests\RenouvelerAbonnementRequest;
 use App\Models\Abonnement;
+use App\Models\Company;
+use App\Models\Formule;
+use App\Models\Payment;
+use Illuminate\Http\JsonResponse;
 
 class AbonnementController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for editing the specified resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param RenouvelerAbonnementRequest $request
+     * @return JsonResponse
      */
-    public function create()
+    public function abonnerRequest(AbonnementRequest $request)
     {
-        //
-    }
+        $data = $request->input();
+        $nombre_unites  = $data["nombre_unites"];
+        $formule_id  = $data["formule_id"];
+        $company_id  = Company::requireLoggedInCompany()->id;
+        $data = [
+            "formule_id"=>$formule_id,
+        "company_id"=>$company_id,
+            "nombre_unite"=>$nombre_unites];
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreAbonnementRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreAbonnementRequest $request)
-    {
-        //
-    }
+       // TODO INITIATE payment WAVE or OM
+        return response()->json(["message"=>"INITIATED"]);
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Abonnement  $abonnement
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Abonnement $abonnement)
-    {
-        //
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Abonnement  $abonnement
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function edit(Abonnement $abonnement)
+    public function saveAbonnerRequest()
     {
-        //
+
+        $data = request()->json();
+        $nombre_unites  = $data["nombre_unites"];
+        $formule_id  = $data["formule_id"];
+        $company_id  = $data["company_id"];
+        $company = Company::find($company_id);
+        $formule = Formule::find($formule_id);
+        $abonnement = new Abonnement();
+        $abonnement->company()->associate($company);
+        $abonnement->formule()->associate($formule);
+        $unite = $formule->unite;
+        if ($unite == "mois"){
+            $abonnement->date_expir->addMonths($nombre_unites);
+        }elseif ($unite =="semaine"){
+            $abonnement->date_expir = $abonnement->date_expir->addWeeks($nombre_unites);
+        }
+        $abonnement->save();
+        // TODO Broadcast event new abonnement
+        return response()->json(["message"=>"OK"]);
+
+    }
+/**
+     * Show the form for editing the specified resource.
+     *
+     * @param Abonnement $abonnement
+     * @param RenouvelerAbonnementRequest $request
+     * @return JsonResponse
+     */
+    public function renouveler(Abonnement $abonnement, RenouvelerAbonnementRequest $request)
+    {
+        //TODO authorisation
+        $data = $request->input();
+        $nombre_unites  = $data["nombre_unites"];
+        $telephone  = $data["telephone"];
+        $unite = $abonnement->formule->unite;
+       // TODO INITIATE payment WAVE or OM
+        $this->renouvelerEnregistrer($abonnement, $data);
+        return response()->json(["message"=>"INITIATED"]);
+
     }
 
     /**
-     * Update the specified resource in storage.
+     * Show the form for editing the specified resource.
      *
-     * @param  \App\Http\Requests\UpdateAbonnementRequest  $request
-     * @param  \App\Models\Abonnement  $abonnement
-     * @return \Illuminate\Http\Response
+     * @param Abonnement $abonnement
+     * @param $data
+     * @return JsonResponse
      */
-    public function update(UpdateAbonnementRequest $request, Abonnement $abonnement)
+    public function renouvelerEnregistrer(Abonnement $abonnement,  $data)
     {
-        //
-    }
+        $payment = new Payment();
+        $payment->abonnement()->associate($abonnement);
+        //TODO change these 2 values
+        $payment->paye_par = "";
+        $payment->montant = 2000;
+        $payment->save();
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Abonnement  $abonnement
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Abonnement $abonnement)
-    {
-        //
+        $nombre_unites  = $data["nombre_unites"];
+        $unite = $abonnement->formule->unite;
+        if ($unite == "mois"){
+            $abonnement->date_expir->addMonths($nombre_unites);
+        }elseif ($unite =="semaine"){
+            $abonnement->date_expir = $abonnement->date_expir->addWeeks($nombre_unites);
+        }
+        $abonnement->save();
+
+        return response()->json(["message"=>"INITIATED"]);
+
     }
 }

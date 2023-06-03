@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\PhoneNumber;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AbonnementRequest extends FormRequest
@@ -11,10 +12,10 @@ class AbonnementRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         // only allow updates if the user is logged in
-        return backpack_auth()->check();
+        return true;
     }
 
     /**
@@ -22,10 +23,13 @@ class AbonnementRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            // 'name' => 'required|min:5|max:255'
+            'methode_paiement' => 'required|string',
+            'nombre_unites' => 'required|integer',
+            "formule_id"=>"required|integer",
+            "telephone"=>['required','integer', new PhoneNumber()]
         ];
     }
 
@@ -34,7 +38,7 @@ class AbonnementRequest extends FormRequest
      *
      * @return array
      */
-    public function attributes()
+    public function attributes(): array
     {
         return [
             //
@@ -46,7 +50,7 @@ class AbonnementRequest extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             //

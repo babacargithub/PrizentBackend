@@ -2,11 +2,10 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\FormuleLimite;
 use App\Rules\PhoneNumber;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreEmployeeRequest extends FormRequest
+class RenouvelerAbonnementRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,11 +25,10 @@ class StoreEmployeeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "prenom"=>"required|string|min:3",
-            "nom"=>"required|string|min:2",
-            "email"=>"email|nullable|unique:employes",
-            "telephone"=>['required','integer', new PhoneNumber(), new FormuleLimite()],
-            "sexe"=>"required|string|max:1"
+            //The number of the units to be used for the length of the duration (it can be days, or months)
+            "nombre_unites"=>'required|integer',
+            "telephone"=>['required','integer', new PhoneNumber()],
+            "methode_paiement"=>"required|string"
             //
         ];
     }
