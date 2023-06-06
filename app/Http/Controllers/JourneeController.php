@@ -23,12 +23,13 @@ class JourneeController extends Controller
         $date = Carbon::create($date);
         $journee = Journee::where("calendrier",$date->toDateString())->first();
         if ($journee != null) {
-            $entrees = EntreeResource::collection(Entree::where("journee_id", $journee->id)->whereRelation("employe", "company_id", "=", Company::requireLoggedInCompany()->id)->orderBy('scanned_at',"asc")->get());
-            $sorties = SortieResource::collection(Sortie::where("journee_id", $journee->id)->whereRelation("employe", "company_id", "=", Company::requireLoggedInCompany()->id)->orderBy('scanned_at',"asc")->get());
+            $entrees = EntreeResource::collection(Entree::where("journee_id", $journee->id)->whereRelation("employe", "company_id", "=", Company::requireLoggedInCompany()->id)->orderBy('scanned_at')->get());
+            $sorties = SortieResource::collection(Sortie::where("journee_id", $journee->id)->whereRelation("employe", "company_id", "=", Company::requireLoggedInCompany()->id)->orderBy('scanned_at')->get());
             return ["journee" => $journee, "sorties" => $sorties, "entrees" => $entrees];
         }
         return [];
     }
+
 
 
 }

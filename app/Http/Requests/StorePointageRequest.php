@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\Mobile\CompanyHasActiveSubscription;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreEntreeRequest extends FormRequest
+class StorePointageRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +26,8 @@ class StoreEntreeRequest extends FormRequest
     {
         return [
             "qr_code_id"=>"required|integer",
-            "employe_id"=>"required|integer"
+            "employe_id"=>["required","integer", new CompanyHasActiveSubscription()],
+            "device"=>"required|array|required_array_keys:uuid"
         ];
     }
 }

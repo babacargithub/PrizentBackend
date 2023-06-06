@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Appareil extends Model
 {
     protected $table ="appareils";
+    protected $fillable = ["uuid","name","last_active"];
     use HasFactory;
 
     public function employe(): BelongsTo

@@ -4,11 +4,12 @@ use App\Http\Controllers\AbonnementController;
 use App\Http\Controllers\AppareilController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\EntreeController;
 use App\Http\Controllers\JourneeController;
+use App\Http\Controllers\Mobile\MobileAppController;
+use App\Http\Controllers\OtpController;
 use App\Http\Controllers\QrCodeController;
-use App\Http\Controllers\SortieController;
 use App\Http\Middleware\CheckIfHasActiveSubscription;
+use App\Http\Middleware\MobileAppRequest;
 use App\Models\Company;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -25,9 +26,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// anonymous and unauthenticated routes
+
 Route::post('/login', function (Request $request){
     $credentials = $request->validate([
         'email' => ['required', 'email'],
@@ -43,23 +43,44 @@ Route::post('/login', function (Request $request){
     }
 
 });
+Route::prefix("mobile/") ->group(function () {
+    Route::post('/fetch_otp', [OtpController::class, "fetchOtp"]);
+
+    Route::post('/check_otp', [OtpController::class, "checkOtp"]
+    );
+});
+
+// mobile app requests
+Route::prefix("mobile/")
+    ->middleware([MobileAppRequest::class])
+    ->group(function (){
+        Route::get('employes/{id}', [MobileAppController::class, "employe"]);
+        Route::get('qr_code_scanned/{qrCode}', [MobileAppController::class, "getQrCode"]);
+        Route::post('pointage', [MobileAppController::class, "pointer"]);
+        Route::post('badge/pointer', [MobileAppController::class, "pointerBadge"]);
+        Route::get('pointages', [MobileAppController::class, "pointages"]);
+
+    });
+
+
+
+// company app authenticated routes
 Route::middleware(["auth:sanctum", CheckIfHasActiveSubscription::class])->group(function() {
     Route::get("pointages/{date}",[JourneeController::class,"pointages"]);
     Route::get('employes/{employe}/rapport/{dateStart}/{dateEnd}', [EmployeeController::class,"rapport"]);
     Route::get('companies/pointeurs', [CompanyController::class,"pointeurs"]);
     Route::put('companies/params', [CompanyController::class,"updateParams"]);
     Route::put('companies/update', [CompanyController::class,"update"]);
-Route::get('companies/show', [CompanyController::class,"show"]);
+    Route::get('companies/show', [CompanyController::class,"show"]);
     Route::resource('employes', EmployeeController::class);
     Route::resource('qr_codes', QrCodeController::class);
     Route::resource('appareils', AppareilController::class,["only" => "destroy"]);
-    Route::resource('entrees', EntreeController::class,["only" => "store"]);
-    Route::resource('sorties', SortieController::class,["only" => "store"]);
 });
+
+// company app unauthenticated routes
+
 Route::middleware(["auth:sanctum"])->group(function() {
     Route::get('companies/index', [CompanyController::class, "abonnementShow"]);
     Route::post('company/abonner', [AbonnementController::class, "abonnerRequest"]);
     Route::post('abonnement/{abonnement}/renouveler/initier', [AbonnementController::class, "renouveler"]);
 });
-
-

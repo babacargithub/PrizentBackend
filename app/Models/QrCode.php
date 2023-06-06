@@ -19,4 +19,12 @@ class QrCode extends Model
         return $this->belongsTo(Company::class);
 
     }
+
+    public function getMaximumDistanceAttribute(): int
+    {
+        //TODO make this dynamic
+        return 300000000000;
+
+    }
+    protected $appends = ["maximum_distance"];
 }

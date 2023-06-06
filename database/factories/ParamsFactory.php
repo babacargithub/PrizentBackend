@@ -20,7 +20,6 @@ class ParamsFactory extends Factory
         return [
             "nom" => $this->faker->unique()->company(),
             "constant_name"=>$this->faker->unique()->word(),
-            "disabled" => false
         ];
     }
 }
