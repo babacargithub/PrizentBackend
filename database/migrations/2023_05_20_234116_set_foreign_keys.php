@@ -64,7 +64,7 @@ return new class extends Migration
         });
         Schema::table('qr_codes', function (Blueprint $table) {
 
-            $table->foreignIdFor(Company::class)->nullable(false)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignIdFor(Company::class)->nullable()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->unique(["company_id","nom"]);
 
         });

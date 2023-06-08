@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Mobile;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StorePointageBadgeRequest;
 use App\Http\Requests\StorePointageRequest;
 use App\Http\Resources\Mobile\EntreeMobileResource;
 use App\Models\Employe;
@@ -78,6 +79,34 @@ class MobileAppController extends Controller
         }
         $journee = Journee::firstOrCreate(["calendrier"=> Carbon::today()->toDateString(), "name" => Carbon::now()->format("d-m-Y")]);
         $pointage->journee()->associate($journee);
+        $pointage->scanned_at = Carbon::now()->toTimeString();
+        $pointage->calculerPonctualite();
+        $pointage->save();
+
+        return $pointage;
+
+    } /**
+     * Display the specified resource.
+     *
+     * @return Model
+     */
+    public function pointerUnBadge(StorePointageBadgeRequest $request)
+    {
+        $type = $request->input('type');
+        //TODO Transform the request
+        $employe_id  = $request->input('employe_id');
+        if ($type == QrCode::TYPE_ENTREE){
+        $pointage = new Entree($request->validated());
+        }else if ($type == QrCode::TYPE_SORTIE){
+            $pointage = new Sortie($request->validated());
+
+        }else{
+            throw new InvalidArgumentException("Type de qr code inconnu ");
+        }
+        $journee = Journee::firstOrCreate(["calendrier"=> Carbon::today()->toDateString(), "name" => Carbon::now()->format("d-m-Y")]);
+        $pointage->journee()->associate($journee);
+        //TODO change this and make comapny specifique
+        $pointage->qrCode()->associate(QrCode::first());
         $pointage->scanned_at = Carbon::now()->toTimeString();
         $pointage->calculerPonctualite();
         $pointage->save();

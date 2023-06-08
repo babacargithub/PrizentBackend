@@ -13,5 +13,10 @@ class Journee extends Model
     protected $fillable = ["calendrier","name","ferie"];
     protected $dates = ["calendrier"];
 
+    public static function today(): Journee
+    {
+        return static::firstOrCreate(["calendrier"=>Carbon::today()->toDateString(),"name" => Carbon::today()->format("d-m-Y")]);
+    }
+
 
 }

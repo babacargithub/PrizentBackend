@@ -17,8 +17,8 @@ return new class extends Migration
         Schema::create('qr_codes', function (Blueprint $table) {
             $table->id();
             $table->string('nom');
-            $table->bigInteger('latitude');
-            $table->bigInteger('longitude');
+            $table->double('latitude');
+            $table->double('longitude');
             $table->integer('max_distance');
             $table->tinyInteger("type")->unsigned()->nullable(false);
             $table->boolean('disabled')->default(false);

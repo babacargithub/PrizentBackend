@@ -9,7 +9,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StorePointageRequest extends FormRequest
+class StorePointageBadgeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,16 +29,18 @@ class StorePointageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "qr_code_id"=>"required|integer",
             "employe_id"=>["required","integer",
                 new CompanyHasActiveSubscription(),
-              Rule::unique(QrCode::find($this->request->get("qr_code_id",0))->type == QrCode::TYPE_ENTREE? 'entrees': "sorties")->where(function (Builder $query) {
+              Rule::unique($this->request->get("type",0) == QrCode::TYPE_ENTREE? 'entrees': "sorties")->where(function (Builder $query) {
               $query->where('employe_id', $this->request->get("employe_id",0));
               $query->where("journee_id", Journee::today()->id);
               })
                 ],
-            "device"=>"required|array|required_array_keys:uuid"
-        ];
+            "type"=>["required","integer",
+                Rule::in([1, 2]),
+
+            ]
+            ];
     }
   public function messages(): array
   {

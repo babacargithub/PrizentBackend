@@ -23,7 +23,7 @@ class QrCode extends Model
     public function getMaximumDistanceAttribute(): int
     {
         //TODO make this dynamic
-        return 300000000000;
+        return 30000000000;
 
     }
     protected $appends = ["maximum_distance"];

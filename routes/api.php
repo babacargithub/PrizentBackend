@@ -57,6 +57,7 @@ Route::prefix("mobile/")
         Route::get('employes/{id}', [MobileAppController::class, "employe"]);
         Route::get('qr_code_scanned/{qrCode}', [MobileAppController::class, "getQrCode"]);
         Route::post('pointage', [MobileAppController::class, "pointer"]);
+        Route::post('pointage_badge', [MobileAppController::class, "pointerUnBadge"]);
         Route::post('badge/pointer', [MobileAppController::class, "pointerBadge"]);
         Route::get('pointages', [MobileAppController::class, "pointages"]);
 

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UpdateCompanyRequest;
 use App\Models\Company;
 use App\Models\Formule;
-use App\Models\HoraireEmploye;
 use Illuminate\Http\Response;
 
 class CompanyController extends Controller
@@ -32,7 +31,9 @@ class CompanyController extends Controller
     public function abonnementShow()
     {
         $abonnement = Company::requireLoggedInCompany()->abonnement;
-        $abonnement->load('formule');
+        if ($abonnement != null){
+            $abonnement->load('formule');
+        }
         $formules = Formule::with("features")->get();
 
         return ["abonnement"=>$abonnement, "formules"=>$formules];
