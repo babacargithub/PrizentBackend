@@ -9,6 +9,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Feature extends Model
 {
     use HasFactory;
+    const FEATURE_RANKINGS = "rankings";
+    const FEATURE_SMS_NOTIFICATIONS = "sms_notifications";
+    const FEATURE_REPORT_EXPORT = "report_export";
+    const FEATURE_MULTIPLE_ACCOUNT = "multiple_account";
     public function formules() : BelongsToMany {
         return  $this->belongsToMany(Formule::class);
     }

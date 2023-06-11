@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Employe;
 use App\Models\Journee;
 use App\Models\QrCode;
 use App\Rules\Mobile\CompanyHasActiveSubscription;
@@ -29,6 +30,8 @@ class StorePointageBadgeRequest extends FormRequest
     public function rules(): array
     {
         return [
+            // TODO if pointage by badge is allowed
+            //TODO verify is pointer is allowed to point
             "employe_id"=>["required","integer",
                 new CompanyHasActiveSubscription(),
               Rule::unique($this->request->get("type",0) == QrCode::TYPE_ENTREE? 'entrees': "sorties")->where(function (Builder $query) {
@@ -39,11 +42,11 @@ class StorePointageBadgeRequest extends FormRequest
             "type"=>["required","integer",
                 Rule::in([1, 2]),
 
-            ]
+            ],
             ];
     }
   public function messages(): array
   {
-      return ["employe_id.unique"=>"Vous avez déjà pointé pour la journée"];
+      return ["employe_id.unique"=>"Cet employé est déjà pointé !"];
   }
 }

@@ -9,12 +9,15 @@ use App\Http\Resources\RapportEmployeItemResource;
 use App\Models\Company;
 use App\Models\Employe;
 use App\Models\Entree;
+use App\Models\Feature;
+use App\Models\Formule;
 use App\Models\HoraireEmploye;
 use App\Models\Journee;
 use App\Models\Sortie;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 
 class EmployeeController extends Controller
 {
@@ -29,6 +32,46 @@ class EmployeeController extends Controller
 //        $this->authorize("viewAny", Employe::class);
         return EmployeResource::collection(Company::requireLoggedInCompany()->employes()->orderBy("prenom")
             ->get());
+
+    }
+    /**
+     * Display the rankings of the employes.
+     *
+     */
+    public function rankings($dateStart, $dateEnd)
+    {
+        if (!Company::requireLoggedInCompany()->abonnement->formule->hasFeature(Feature::FEATURE_RANKINGS)){
+            $formule = Formule::whereRelation('features',"constant_name",Feature::FEATURE_RANKINGS)->first();
+            $formuleName = $formule?->nom;
+            return response()->json(["message"=>"Cette fonctionnalité n'est pas incluse dans votre abonnement.".($formuleName != null ? " Elle est disponible à partir de la formule  $formuleName" :'')])->setStatusCode(403);
+        }
+        $employes = Company::requireLoggedInCompany()->employes;
+        $supplementRankings = [];
+        $ponctualiteRankings = [];
+        foreach ($employes as $employe) {
+            $ponctualite = Entree::whereEmployeId($employe->id)
+                ->whereHas("journee",function (Builder $query) use ($dateStart, $dateEnd){
+                    $query->whereBetween("calendrier", [$dateStart, $dateEnd]); }
+                )->sum("ponctualite");
+            $supplement = Sortie::whereEmployeId($employe->id)
+                ->whereHas("journee",function (Builder $query) use ($dateStart, $dateEnd){
+                    $query->whereBetween("calendrier", [$dateStart, $dateEnd]); }
+                )->sum("ponctualite");
+            $supplementRankings[] = ["employe"=>$employe->full_name, "ponctualite"=>$supplement];
+            $ponctualiteRankings[] = ["employe"=>$employe->full_name, "ponctualite"=>$ponctualite];
+        }
+
+        $ponctualiteRankings = collect($ponctualiteRankings)->sortByDesc("ponctualite")->values()->map(function (array $item, int $key) {
+             $item["position"]= $key+1;
+             return $item;
+        });
+        $supplementRankings = collect($supplementRankings)->sortByDesc("ponctualite")->values()->map(function (array $item, int $key) {
+             $item["position"]= $key+1;
+             return $item;
+        });
+
+
+        return ["supplementRankings"=>$supplementRankings->values(), "ponctualiteRankings"=>$ponctualiteRankings->values()];
 
     }
     /**

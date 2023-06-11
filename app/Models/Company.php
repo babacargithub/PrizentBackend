@@ -61,7 +61,10 @@ class Company extends Model
 
         $company = Company::where('user_id',request()->user()->id)->first();
         if ($company == null){
+            $company = Company::whereRelation("users",'users.id',request()->user()->id)->first();
+            if ($company == null){
             throw new NotFoundHttpException("Unable to find company with user account id");
+            }
         }
         return $company;
     }

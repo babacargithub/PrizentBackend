@@ -6,6 +6,7 @@ use Alert;
 use App\Http\Requests\CompanyRequest;
 use App\Models\Company;
 use App\Models\User;
+use App\Policies\RoleNames;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
@@ -108,6 +109,8 @@ class CompanyCrudController extends CrudController
         $userAccount->name = $company->nom;
         $userAccount->email_verified_at = Carbon::now();
         $userAccount->password = Hash::make("0000");
+        $userAccount->save();
+        $userAccount->assignRole(RoleNames::ROLE_COMPANY_CEO);
         $userAccount->save();
         $company->user()->associate($userAccount);
         $company->save();

@@ -58,7 +58,6 @@ Route::prefix("mobile/")
         Route::get('qr_code_scanned/{qrCode}', [MobileAppController::class, "getQrCode"]);
         Route::post('pointage', [MobileAppController::class, "pointer"]);
         Route::post('pointage_badge', [MobileAppController::class, "pointerUnBadge"]);
-        Route::post('badge/pointer', [MobileAppController::class, "pointerBadge"]);
         Route::get('pointages', [MobileAppController::class, "pointages"]);
 
     });
@@ -69,10 +68,17 @@ Route::prefix("mobile/")
 Route::middleware(["auth:sanctum", CheckIfHasActiveSubscription::class])->group(function() {
     Route::get("pointages/{date}",[JourneeController::class,"pointages"]);
     Route::get('employes/{employe}/rapport/{dateStart}/{dateEnd}', [EmployeeController::class,"rapport"]);
+    Route::get('employes/rankings/{dateStart}/{dateEnd}', [EmployeeController::class,"rankings"]);
     Route::get('companies/pointeurs', [CompanyController::class,"pointeurs"]);
     Route::put('companies/params', [CompanyController::class,"updateParams"]);
     Route::put('companies/update', [CompanyController::class,"update"]);
     Route::get('companies/show', [CompanyController::class,"show"]);
+    Route::post('companies/create_user', [CompanyController::class,"createUser"]);
+    Route::get('companies/users', [CompanyController::class,"getUsers"]);
+    Route::post('companies/users/{user}/update_permissions', [CompanyController::class,"updatePermissions"]);
+    Route::get('companies/users/{user}/get_permissions', [CompanyController::class,"getUserPermissions"]);
+    Route::put('companies/users/{user}/update', [CompanyController::class,"updateUser"]);
+    Route::post('companies/users/{user}/delete', [CompanyController::class,"deleteUser"]);
     Route::resource('employes', EmployeeController::class);
     Route::resource('qr_codes', QrCodeController::class);
     Route::resource('appareils', AppareilController::class,["only" => "destroy"]);

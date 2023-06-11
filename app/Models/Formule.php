@@ -15,4 +15,9 @@ class Formule extends Model
     public function features() : BelongsToMany {
         return  $this->belongsToMany(Feature::class);
     }
+
+    public function hasFeature($feature) : bool
+    {
+        return  $this->features()->whereConstantName($feature)->first() != null;
+    }
 }

@@ -39,11 +39,17 @@ class Employe extends Model
         return $this->hasMany(Appareil::class);
 
     }
-    protected $casts = ["pointeur" => 'boolean'];
+    protected $casts = ["pointeur" => 'boolean',"badge_autorise"=>"boolean","telephone" => "integer"];
 
     public function horaires(): HasMany
     {
         return $this->hasMany(HoraireEmploye::class);
+
+    }
+
+    public function isBadgeAllowed(): bool
+    {
+        return (boolean) $this->attributes["badge_autorise"];
 
     }
 
