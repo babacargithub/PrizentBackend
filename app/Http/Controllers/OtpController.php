@@ -23,6 +23,8 @@ class OtpController extends Controller
             return response()->json(["message"=>"Aucun compte lié avec ce numéro !"], 422);
         }
         CodeOtp::wherePhoneNumber($data["phone_number"])->delete();
+        // TODO uncomment this  via SMS
+
 //        $codeOtpGenerated = mt_rand(1111,9999);
         $codeOtpGenerated = 1234;
         CodeOtp::create(["otp" => $codeOtpGenerated,"phone_number" => $data["phone_number"],"expires_at" => Carbon::now()->addMinutes(15)]);

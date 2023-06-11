@@ -73,7 +73,6 @@ class AbonnementController extends Controller
      */
     public function renouveler(Abonnement $abonnement, RenouvelerAbonnementRequest $request)
     {
-        //TODO authorisation
         $data = $request->input();
         $nombre_unites  = $data["nombre_unites"];
         $telephone  = $data["telephone"];

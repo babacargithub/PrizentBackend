@@ -15,9 +15,10 @@ use App\Models\HoraireEmploye;
 use App\Models\Journee;
 use App\Models\Sortie;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
-use Illuminate\Support\Collection;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class EmployeeController extends Controller
 {
@@ -28,8 +29,6 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        //todo un comment
-//        $this->authorize("viewAny", Employe::class);
         return EmployeResource::collection(Company::requireLoggedInCompany()->employes()->orderBy("prenom")
             ->get());
 
@@ -77,12 +76,14 @@ class EmployeeController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return Employe[]
+     * @return Employe[]|JsonResponse
      */
     public function rapport(Employe $employe, $dateStart, $dateEnd)
     {
-        //todo un comment
-//        $this->authorize("viewAny", Employe::class);
+        if (! $this->belongsToCompany($employe)){
+
+            return  $this->forbiddenResponse();
+        }
         $entreeQuery = Entree::where("employe_id", $employe->id);
         $entrees = $entreeQuery
             ->whereRelation("employe","company_id","=",Company::requireLoggedInCompany()->id)
@@ -135,7 +136,7 @@ class EmployeeController extends Controller
     {
         $request->validate($request->rules());
         $employe = new Employe($request->input());
-        $company = $this->requireUserAccountOfLoggedInCompany();
+        $company = Company::requireLoggedInCompany();
         $employe->company()->associate($company);
         $employe->save();
         $employe->horaires()->createMany($request->input()["horaires"]);
@@ -148,12 +149,14 @@ class EmployeeController extends Controller
      * Display the specified resource.
      *
      * @param Employe $employe
-     * @return Employe
+     * @return Employe|JsonResponse
      */
     public function show(Employe $employe)
     {
-        //todo uncomment
-//        $this->authorize("view", $employe);
+        if (! $this->belongsToCompany($employe)){
+
+            return  $this->forbiddenResponse();
+        }
         $employe->load("horaires");
         $employe->load("appareils");
         $employe->appareils()->get();
@@ -167,12 +170,14 @@ class EmployeeController extends Controller
      *
      * @param UpdateEmployeeRequest $request
      * @param Employe $employe
-     * @return Employe
+     * @return Employe|JsonResponse
      */
     public function update(UpdateEmployeeRequest $request, Employe $employe)
     {
-        //todo uncomment later
-//        $this->authorize("update",$employe);
+        if (! $this->belongsToCompany($employe)){
+
+            return  $this->forbiddenResponse();
+        }
         $employe->update($request->input());
 
         if (isset($request->input()["horaires"])) {
@@ -190,14 +195,32 @@ class EmployeeController extends Controller
      * Remove the specified resource from storage.
      *
      * @param Employe $employe
-     * @return Response
+     * @return JsonResponse|Response
      */
     public function destroy(Employe $employe)
     {
-        //todo un comment later
-//        $this->authorize("delete",$employe);
+       if (! $this->belongsToCompany($employe)){
+
+           return  $this->forbiddenResponse();
+       }
         $employe->delete();
         return  new Response('deleted');
+    }
+
+    /**
+     * @param Employe $employe
+     * @return bool
+     */
+    protected function belongsToCompany(Employe $employe): bool
+    {
+        return Company::requireLoggedInCompany()
+            ->employes()->whereId($employe->id)->first() !== null;
+
+    }
+
+    private function forbiddenResponse(): JsonResponse
+    {
+        return response()->json(["message"=>"Accès refusé"])->setStatusCode(ResponseAlias::HTTP_FORBIDDEN);
     }
 
 }

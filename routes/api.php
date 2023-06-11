@@ -11,6 +11,8 @@ use App\Http\Controllers\QrCodeController;
 use App\Http\Middleware\CheckIfHasActiveSubscription;
 use App\Http\Middleware\MobileAppRequest;
 use App\Models\Company;
+use App\Models\User;
+use App\Rules\PhoneNumber;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +36,14 @@ Route::post('/login', function (Request $request){
         'password' => ['required'],
     ]);
     if (Auth::attempt($credentials)) {
+        $request->validate([
+            'email' => [function($attribute,$value, $fail){
+            if (request()->user()->disabled){
+                $fail("Compte désactivé !");
+                Auth::logout();
+            }
+            }],
+        ]);
         $token = request()->user()->createToken("name", [], Carbon::now()->addDays(30));
         $company  = Company::where('user_id', request()->user()->id)->first();
         return response(["token"=>$token,"company"=>$company]);
@@ -41,6 +51,42 @@ Route::post('/login', function (Request $request){
 
         return response("Invalid credentials")->setStatusCode(401);
     }
+
+});
+Route::post('/request_password_reset', function (Request $request){
+    $validated = $request->validate([
+        'email' => ['email'],
+        'telephone' => ["nullable", new PhoneNumber()]
+    ]);
+    $email = $validated["email"];
+    $user = User::whereEmail($email)->first();
+    if ($user != null){
+       // TODO Generate and SEND OTP
+        return response()->json(["message"=>"otp_sent"]);
+
+    }
+    return response()->json(["message"=>"Aucun compete associé avec cet email!"])->setStatusCode(422);
+
+});
+Route::post('/reset_password', function (Request $request){
+    $validated = $request->validate([
+        'codeOtp' => ['required','numeric',"digits:4"],
+        'email' => ['email','required'],
+        'newPassword' => ["required" ],
+        'repeatedPassword' => ["required" ]
+    ], [
+        "newPassword.required"=>"Le champ nouveau mot de passe est obligatoire"]);
+    //TODO check otp match
+    $email = $validated["email"];
+    $user = User::whereEmail($email)->first();
+    if ($user == null){
+        return response()->json(["message"=>"Aucun compete associé avec cet email!"])->setStatusCode(422);
+
+    }
+    $user->password = Hash::make($validated["newPassword"]);
+    $user->save();
+
+    return response()->json(["message"=>"reset"]);
 
 });
 Route::prefix("mobile/") ->group(function () {
