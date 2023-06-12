@@ -8,6 +8,12 @@ use Illuminate\Translation\PotentiallyTranslatedString;
 
 class PhoneNumber implements InvokableRule
 {
+    private  $mobile;
+    public function __construct($mobile = true)
+    {
+        $this->mobile = $mobile;
+    }
+
     /**
      * Run the validation rule.
      *
@@ -19,8 +25,14 @@ class PhoneNumber implements InvokableRule
     public function __invoke($attribute, $value, $fail): void
     {
         //
-        if(!preg_match("/^7[76805][0-9]{7}$/", $value)){
-            $fail("Numéro téléphone invalide !");
+        if ($this->mobile) {
+            if (!preg_match("/^7[76805][0-9]{7}$/", $value)) {
+                $fail("Numéro téléphone invalide !");
+            }
+        } else {
+            if (!preg_match("/^[73][376805][0-9]{7}$/", $value)) {
+                $fail("Numéro téléphone invalide !");
+            }
         }
 
     }

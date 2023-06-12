@@ -2,11 +2,10 @@
 @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 @stack('style')
 @section('content')
-    <h6>Badges QR CODE</h6>
-    {{$unused_count}}
+    <h6>QR Codes</h6>
     <div id="app">
-        <badges-index>
-        </badges-index>
+        <qr-codes-index>
+        </qr-codes-index>
     </div>
 @endsection
 

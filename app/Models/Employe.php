@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -31,6 +32,10 @@ class Employe extends Model
     public function company() : BelongsTo
     {
         return  $this->belongsTo(Company::class);
+
+    }  public function badge() : HasOne
+    {
+        return  $this->hasOne(Badge::class);
 
     }
 

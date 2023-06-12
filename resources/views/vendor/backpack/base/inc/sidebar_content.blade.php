@@ -5,7 +5,16 @@
 <li class="nav-item"><a class="nav-link" href="{{ backpack_url('formule') }}"><i class="nav-icon la la-list"></i> Formules</a></li>
 <li class="nav-item"><a class="nav-link" href="{{ backpack_url('payment') }}"><i class="nav-icon la la-shopping-cart"></i> Payments</a></li>
 <li class="nav-item"><a class="nav-link" href="{{ backpack_url('abonnement') }}"><i class="nav-icon la la-check-circle"></i> Abonnements</a></li>
-<li class="nav-item"><a class="nav-link" href="{{ backpack_url('badges') }}"><i class="nav-icon la la-id-badge"></i> Badges</a></li>
+<li class="nav-item nav-dropdown">
+    <a class="nav-link nav-dropdown-toggle" href="#">
+        <i class="nav-icon la la-id-badge"></i> Badges</a>
+    <ul class="nav-dropdown-items">
+        <li class="nav-item"><a class="nav-link" href="{{ backpack_url('badges') }}"><i
+                    class="nav-icon la la-cart-plus"></i> Badges</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ backpack_url('badges/generate') }}"><i
+                    class="nav-icon la la-list"></i> <span>Générer</span></a></li>
+    </ul>
+</li>
 <li class="nav-item"><a class="nav-link" href="{{ backpack_url('qr_codes') }}"><i class="nav-icon la la-qrcode"></i> QR Codes</a></li>
 <li class="nav-item nav-dropdown"><a class="nav-link nav-dropdown-toggle" href="#"><i class="nav-icon la la-cog"></i> Administrations</a>
     <ul class="nav-dropdown-items">

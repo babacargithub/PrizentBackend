@@ -3,12 +3,11 @@
         <q-card class="">
             <div class="col-md-8">
                 <div class="card">
-                    <div class="card-header">Attribuer un Badge</div>
+                    <div class="card-header">Générer un lot de Badges</div>
                     <AlertError v-if="error != null">{{error}}</AlertError>
-                    <q-form @submit.prevent="submit">
-                        <q-input label="Numéro Badge" v-model="data.badge_number"></q-input>
-                        <q-input label="Téléphone Employé" v-model="data.employe_telephone"></q-input>
-                        <q-btn color="primary" type="submit">Soumettre</q-btn>
+                    <q-form @submit.prevent="submitRequest">
+                        <q-input label="Nombre à générer" required v-model.number="quantity"></q-input>
+                        <q-btn type="submit" color="primary">Générer</q-btn>
                     </q-form>
                 </div>
             </div>
@@ -18,35 +17,31 @@
 
 <script>
     import {Loading} from "quasar";
-    import AlertError from "./AlertError.vue";
     import Swal from "sweetalert2";
+    import AlertError from "./AlertError.vue";
 
     export default {
-        name: "LinkBadge",
+        name: "GenerateBadge",
         components: {AlertError},
-        data() {
-            return {
-                data: {
-                    employe_telephone: null,
-                    badge_number: null
-                },
-                error: null
-            }
-        },
         mounted() {
             console.log('Component mounted.')
         },
+        data() {
+            return {
+                error: null,
+                quantity: 0,
+            }
+        },
         methods:{
-            submit(){
+            submitRequest(){
                 Loading.show({message: "Chargement"})
                 this.error = null
-                window.axios.post("badges/link",this.data )
+                window.axios.post("generate", {quantity:this.quantity})
                     .then(r => {
                         Swal.fire({
-                            text:"Attribué avec succès !",
+                            text:"Généré avec succès !",
                             icon:"success",
                         })
-
                     }).catch(e => {
                     this.error = e.response.data.message
                 }).finally(() => {

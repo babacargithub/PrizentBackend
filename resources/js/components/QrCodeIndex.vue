@@ -1,14 +1,14 @@
 <template>
     <q-badge color="primary" align="middle" label="Unused"></q-badge>
-    <LinkBadge></LinkBadge>
+    <LinkQRCode></LinkQRCode>
 
 </template>
 
 <script>
-    import LinkBadge from "./LinkBadge.vue";
+    import LinkQRCode from "./LinkQrCode.vue";
 
     export default {
-        components: {LinkBadge},
+        components: {LinkQRCode},
         mounted() {
         },
         methods:{

@@ -12,6 +12,8 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 
 import { Quasar } from 'quasar'
+import { Dialog } from 'quasar'
+import { Loading } from 'quasar'
 
 // Import icon libraries
 import '@quasar/extras/roboto-font-latin-ext/roboto-font-latin-ext.css'
@@ -45,7 +47,11 @@ const app = createApp({});
 
 import ExampleComponent from './components/ExampleComponent.vue';
 import BadgesIndex from './components/BadgesIndex.vue';
+import QRCodesIndex from './components/QrCodeIndex.vue';
+import GenerateBadge from './components/GenerateBatch.vue';
 app.component('badges-index', BadgesIndex);
+app.component('qr-codes-index', QRCodesIndex);
+app.component('generate-badge', GenerateBadge);
 
 /**
  * The following block of code may be used to automatically register your
@@ -67,6 +73,6 @@ app.component('badges-index', BadgesIndex);
 
 app.use(vuetify)
 .use(Quasar, {
-    plugins: {}, // import Quasar plugins and add here
+    plugins: {Loading, Dialog}, // import Quasar plugins and add here
 })
     .mount('#app');
