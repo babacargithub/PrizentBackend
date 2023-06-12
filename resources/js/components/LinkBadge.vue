@@ -4,6 +4,7 @@
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">Link Badge</div>
+                    <q-btn color="primary">Test Quasar</q-btn>
 
                     <v-text-field color="dark"  label="Badge Number">
                     </v-text-field>

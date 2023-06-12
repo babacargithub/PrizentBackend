@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
+import { quasar, transformAssetUrls } from '@quasar/vite-plugin'
 
 export default defineConfig({
     plugins: [
@@ -19,6 +20,9 @@ export default defineConfig({
                 },
             },
         }),
+        quasar({
+            sassVariables: 'resources/css/quasar-variables.sass'
+        })
     ],
     resolve: {
         alias: {
@@ -26,3 +30,20 @@ export default defineConfig({
         },
     },
 });
+
+
+// FILE: vite.config.js
+
+
+// https://vitejs.dev/config/
+/*export default defineConfig({
+    plugins: [
+        vue({
+            template: { transformAssetUrls }
+        }),
+
+        quasar({
+            sassVariables: 'src/quasar-variables.sass'
+        })
+    ]
+})*/
