@@ -20,6 +20,7 @@ class QrCodeFactory extends Factory
             "nom" => $this->faker->company(),
             "latitude" => $this->faker->latitude(),
             "longitude" => $this->faker->longitude(),
+            "maximum_distance" => $this->faker->numberBetween(2000,9000),
             "disabled" => false,
             "type" => 1,
         ];

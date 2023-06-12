@@ -16,7 +16,7 @@ class Employe extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["pointeur","prenom","nom","sexe","telephone","email","id","company_id","disabled"];
+    protected $fillable = ["pointeur","prenom","nom","sexe","telephone","email","id","company_id","disabled","poste","badge_autorise"];
 
     public static function requiredLoggedInEmploye(): Employe
     {

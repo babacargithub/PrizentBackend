@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Employe;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -27,14 +28,17 @@ class EmployeResource extends JsonResource
      */
     public function toArray($request): array|JsonSerializableAlias|Arrayable
     {
+        /** @var Employe $this */
         return [
             "fullName"=>$this->prenom. ' '.$this->nom,
             "id"=>$this->id,
             "prenom"=>$this->prenom,
+            "poste"=>$this->poste,
             "nom"=>$this->nom,
             "telephone"=>$this->telephone,
             "email"=>$this->email,
             "sexe"=>$this->sexe,
+            "badge_autorise"=>(bool)$this->badge_autorise,
             "appareils"=>$this->appareils,
             "horaires"=>HoraireEmployeResource::collection($this->horaires)
         ];

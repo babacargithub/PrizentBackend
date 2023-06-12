@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\BadgeController;
+use App\Http\Controllers\Admin\RapportController;
 use Illuminate\Support\Facades\Route;
 
 // --------------------------
@@ -16,8 +18,15 @@ Route::group([
     ),
     'namespace'  => 'App\Http\Controllers\Admin',
 ], function () { // custom admin routes
+    Route::crud('user', 'UserCrudController');
     Route::crud('company', 'CompanyCrudController');
     Route::crud('formule', 'FormuleCrudController');
     Route::crud('payment', 'PaymentCrudController');
     Route::crud('abonnement', 'AbonnementCrudController');
+    Route::get("rapports",[RapportController::class,"rapports"])->name('rapport.index');
+    Route::get("badges",[BadgeController::class,"index"])->name('rapport.index');
+    Route::get("qr_codes",[BadgeController::class,"index"])->name('qr-codes.index');
+    Route::get("soldes",[RapportController::class,"soldes"])->name('soldes.solde');
+    Route::get("stats",[RapportController::class,"stats"])->name('stats.stats');
+
 }); // this should be the absolute last line of this file

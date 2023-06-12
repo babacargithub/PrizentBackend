@@ -4,7 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use Alert;
 use App\Http\Requests\CompanyRequest;
+use App\Http\Requests\StoreCompanyRequest;
+use App\Models\Abonnement;
 use App\Models\Company;
+use App\Models\CompanyParams;
+use App\Models\Formule;
+use App\Models\Params;
 use App\Models\User;
 use App\Policies\RoleNames;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
@@ -101,7 +106,7 @@ class CompanyCrudController extends CrudController
         $this->setupCreateOperation();
     }
 
-    public function store(CompanyRequest $request)
+    public function store(StoreCompanyRequest $request)
     {
         $company = new Company($this->crud->getStrippedSaveRequest($request));
         $userAccount = new User();
@@ -111,9 +116,20 @@ class CompanyCrudController extends CrudController
         $userAccount->password = Hash::make("0000");
         $userAccount->save();
         $userAccount->assignRole(RoleNames::ROLE_COMPANY_CEO);
-        $userAccount->save();
+        $userAccount->telephone = $company->telephone;
         $company->user()->associate($userAccount);
         $company->save();
+        $abonnement = new Abonnement(["date_expir" => Carbon::now()->addDays(2)->toDateTimeString()]);
+        $abonnement->formule()->associate(Formule::first());
+        $abonnement->company()->associate($company);
+        $abonnement->save();
+        $userAccount->save();
+        // create params
+        $params = Params::all();
+
+        foreach ($params as $param) {
+            $company->params()->save($param);
+        }
         // show a success message
         Alert::success(trans('backpack::crud.insert_success'))->flash();
 

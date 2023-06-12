@@ -204,12 +204,16 @@ class CompanyController extends Controller
             return  $this->forbiddenResponse();
 
         }
-        $companyUserAccountPermissions = Company::requireLoggedInCompany()->user->permissions;
+        $roles = Company::requireLoggedInCompany()->user->roles;
         $permissions = [];
-        foreach ($companyUserAccountPermissions as /** @var Permission $permission */$permission) {
-            $item = ["name"=>$permission->name, "enabled"=>$user->hasPermissionTo($permission->name)];
-            $permissions[] = $item;
+        foreach ( $roles as $role ) {
+            $companyUserAccountPermissions = $role->permissions;
 
+            foreach ($companyUserAccountPermissions as /** @var Permission $permission */ $permission) {
+                $item = ["name" => $permission->name, "enabled" => $user->hasPermissionTo($permission->name)];
+                $permissions[] = $item;
+
+            }
         }
 
         return $permissions;

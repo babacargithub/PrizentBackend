@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->string('nom');
             $table->double('latitude');
             $table->double('longitude');
-            $table->integer('max_distance');
+            $table->integer('maximum_distance');
             $table->tinyInteger("type")->unsigned()->nullable(false);
             $table->boolean('disabled')->default(false);
             $table->timestamps();

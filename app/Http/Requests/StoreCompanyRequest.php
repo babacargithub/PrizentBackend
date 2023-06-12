@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Policies\RoleNames;
+use App\Rules\PhoneNumber;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreCompanyRequest extends FormRequest
@@ -11,9 +13,10 @@ class StoreCompanyRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
-        return false;
+        // TODO change authorisaitons
+       return true;
     }
 
     /**
@@ -24,6 +27,8 @@ class StoreCompanyRequest extends FormRequest
     public function rules()
     {
         return [
+            "telephone"=>["unique:companies", new PhoneNumber()],
+            "email"=>"email|unique:companies"
             //
         ];
     }

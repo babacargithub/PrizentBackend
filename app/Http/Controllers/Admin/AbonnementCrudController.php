@@ -3,21 +3,28 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\AbonnementRequest;
+use App\Models\Abonnement;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
+use Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
+use Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
+use Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
+use Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
+use Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
+use Backpack\CRUD\app\Library\CrudPanel\CrudPanel;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
 /**
  * Class AbonnementCrudController
  * @package App\Http\Controllers\Admin
- * @property-read \Backpack\CRUD\app\Library\CrudPanel\CrudPanel $crud
+ * @property-read CrudPanel $crud
  */
 class AbonnementCrudController extends CrudController
 {
-    use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
+    use ListOperation;
+    use CreateOperation;
+    use UpdateOperation;
+    use DeleteOperation;
+    use ShowOperation;
 
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
@@ -26,7 +33,7 @@ class AbonnementCrudController extends CrudController
      */
     public function setup()
     {
-        CRUD::setModel(\App\Models\Abonnement::class);
+        CRUD::setModel(Abonnement::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/abonnement');
         CRUD::setEntityNameStrings('abonnement', 'abonnements');
     }
@@ -36,15 +43,14 @@ class AbonnementCrudController extends CrudController
      *
      * @see  https://backpackforlaravel.com/docs/crud-operation-list-entries
      * @return void
+     * @noinspection PhpUnused
      */
     protected function setupListOperation()
     {
-        CRUD::column('company_id');
-        CRUD::column('formule_id');
-        CRUD::column('created_at');
-        CRUD::column('updated_at');
-        CRUD::column('deleted_at');
-        CRUD::column('date_expir');
+        $this->crud->orderBy("date_expir","desc");
+        $this->crud->addColumn(["label"=>"Société","type"=>"entity", "relation"=>"company","attribute"=>"nom"]);
+       $this->crud->addColumn(["label"=>"Formule","type"=>"entity", "relation"=>"formule","attribute"=>"nom"]);
+        CRUD::column('date_expir')->label("Expire le");
 
         $this->crud->removeAllButtonsFromStack("top");
 
@@ -82,6 +88,8 @@ class AbonnementCrudController extends CrudController
      *
      * @see https://backpackforlaravel.com/docs/crud-operation-update
      * @return void
+     * @noinspection PhpUnused
+
      */
     protected function setupUpdateOperation()
     {

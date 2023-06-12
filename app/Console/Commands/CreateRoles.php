@@ -43,6 +43,7 @@ class CreateRoles extends Command
     {
         $this->saveRoles();
         $this->savePermissions();
+        $this->givePermissions();
 
         return 0;
     }
@@ -52,7 +53,10 @@ class CreateRoles extends Command
         $roleNames = RoleNames::ROLES;
         $roles = [];
         foreach ($roleNames as $roleName) {
+            if(Role::whereName($roleName)->first() == null){
+
             $roles[] = ["name" => $roleName, "guard_name" => "web"];
+            }
 
         }
         Role::insert($roles);
@@ -63,10 +67,37 @@ class CreateRoles extends Command
         $permissionNames = PermissionNames::PERMISSION_NAMES;
         $permissions = [];
         foreach ($permissionNames as $permissionName) {
-            $permissions[] = ["name" => $permissionName, "guard_name" => "web"];
+            if(Permission::whereName($permissionName)->first() == null) {
+                $permissions[] = ["name" => $permissionName, "guard_name" => "web"];
+            }
 
         }
         Permission::insert($permissions);
+
+    }
+    public function givePermissions(): void
+    {
+
+        $prizentCeoPermissions = PermissionNames::PRIZENT_CEO_PERMISSIONS;
+        $companyCeoPermissions = PermissionNames::COMPANY_CEO_PERMISSIONS;
+        $prizentCeoRole = Role::whereName(RoleNames::ROLE_PRIZENT_CEO)->first();
+        if ($prizentCeoRole != null) {
+            foreach ($prizentCeoPermissions as $permissionName) {
+               $prizentCeoRole->givePermissionTo($permissionName);
+
+
+            }
+            $prizentCeoRole->save();
+        }
+        $companyCeoRole = Role::whereName(RoleNames::ROLE_COMPANY_CEO)->first();
+        if ($companyCeoRole != null) {
+            foreach ($companyCeoPermissions as $permissionName) {
+                $companyCeoRole->givePermissionTo($permissionName);
+
+
+            }
+            $companyCeoRole->save();
+        }
 
     }
 }

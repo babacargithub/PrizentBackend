@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\PaymentRequest;
 use App\Models\Payment;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
@@ -47,10 +46,11 @@ class PaymentCrudController extends CrudController
      */
     protected function setupListOperation()
     {
-        CRUD::column('abonnement_id');
+        $this->crud->orderBy("created_at","desc");
+        $this->crud->addColumn(["label"=>"Société","type"=>"entity", "relation"=>"abonnement","attribute"=>"company"]);
         CRUD::column('montant');
-        CRUD::column('paye_par');
-        CRUD::column('created_at');
+        CRUD::column('paye_par')->label("Payé par");
+        CRUD::column('created_at')->label("Payé le");
         $this->crud->removeAllButtons();
 
 

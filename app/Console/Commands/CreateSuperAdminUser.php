@@ -8,6 +8,7 @@ use App\Policies\RoleNames;
 use Backpack\PermissionManager\app\Models\Permission;
 use Backpack\PermissionManager\app\Models\Role;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
 
 class CreateSuperAdminUser extends Command
@@ -47,26 +48,11 @@ class CreateSuperAdminUser extends Command
         if ($user != null){
            $this->error("Un utilisateur existe déjà, le super admin est crée au debut de l'application");
         }else{
-            $user = User::create(["name"=>"Super Admin","email"=>$this->argument("email"),"password"=>Hash::make("0000")]);
-///*
-//            $this->saveRoles();
-//            $this->savePermissions();
-//             /** @var Permission $permission */
-//            $permission = Permission::findByName(PermissionNames::ACCESS_SUPER_ADMIN_AREA);
-//            $role = Role::findByName(RoleNames::ROLE_SUPER_ADMIN);
-//            $permission->assignRole($role)->save();
-//            $role->givePermissionTo(PermissionNames::ACCESS_SUPER_ADMIN_AREA);
-//            $role->save();
-//            $user = User::create(["name"=>"Super Admin","email"=>$this->argument("email"),"password"=>Hash::make("0000")]);
-//            $permissions = Permission::all();
-//            foreach ($permissions as $permission) {
-//                $user->givePermissionTo($permission->name);
-//
-//            }  $roles = Role::all();
-//                foreach ($roles as $role) {
-//                    $user->assignRole($role);
-//                }*/
-        $this->info("Super admin user created success");
+            Artisan::call("user:create-roles");
+            $user = User::create(["name"=>"Directeur Général Prizent","email"=>$this->argument("email"),"password"=>Hash::make("0000")]);
+            $user->assignRole(RoleNames::ROLE_PRIZENT_CEO);
+            $user->save();
+            $this->info("Super admin user created success");
         }
         return 0;
     }

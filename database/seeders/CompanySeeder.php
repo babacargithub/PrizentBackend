@@ -16,6 +16,7 @@ use App\Models\Payment;
 use App\Models\QrCode;
 use App\Models\Sortie;
 use App\Models\User;
+use App\Policies\RoleNames;
 use Artisan;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Seeder;
@@ -31,8 +32,9 @@ class CompanySeeder extends Seeder
     {
         //
         Artisan::call("db:reset");
-        Artisan::call("user:create-super-admin",["email"=>"golobone@gmail.com"]);
-        $user = User::factory()->create();
+        Artisan::call("user:create-super-admin",["email"=>"pdzprizent@gmail.com"]);
+        $user = User::create(["email"=>"golobone@gmail.com","name"=>"Golob One Transport","password"=>\Hash::make('0000')]);
+        $user->assignRole(RoleNames::ROLE_COMPANY_CEO);
         $company = Company::factory()->make();
         $company->user()->associate($user);
         $company->save();

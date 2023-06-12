@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Params extends Model
 {
     use HasFactory;
+    const PARAM_NOTIFICATION_ENTREE = "Notification Entrée";
+    const PARAM_NOTIFICATION_SORITE = "Notification Sortie";
     protected $fillable = ["nom","constant_name","disabled"];
     public $timestamps = false;
 

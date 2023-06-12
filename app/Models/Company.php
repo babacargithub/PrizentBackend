@@ -72,4 +72,10 @@ class Company extends Model
     {
         return $this->abonnement != null && $this->abonnement->isActive();
     }
+
+    public function __toString() : string
+    {
+        return  (string) $this->attributes["nom"];
+
+    }
 }
