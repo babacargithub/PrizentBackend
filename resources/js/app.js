@@ -38,11 +38,14 @@ import 'quasar/src/css/index.sass'
 const app = createApp({});
 
 import BadgesIndex from './components/BadgesIndex.vue';
+import GenerateQrCode from './components/GenerateQRCodeBatch.vue';
 import QRCodesIndex from './components/QrCodeIndex.vue';
 import GenerateBadge from './components/GenerateBatch.vue';
+import Swal from "sweetalert2";
 app.component('badges-index', BadgesIndex);
 app.component('qr-codes-index', QRCodesIndex);
 app.component('generate-badge', GenerateBadge);
+app.component('generate-qrcode', GenerateQrCode);
 
 /**
  * The following block of code may be used to automatically register your
@@ -61,7 +64,28 @@ app.component('generate-badge', GenerateBadge);
  * an "id" attribute of "app". This element is included with the "auth"
  * scaffolding. Otherwise, you will need to add an element yourself.
  */
-
+app.mixin({
+    methods: {
+        showAlertSuccess(message, onClose){
+            Swal.fire({
+                icon: "success",
+                text: message
+            }).then(value=>{
+                if (typeof onClose === "function"){
+                    onClose()
+                }
+            })
+        },
+        showLoading(){
+            Loading.show({
+                message: "Chargement",
+                spinnerColor: "green",
+            })
+        } , hideLoading(){
+            Loading.hide()
+        }
+    }
+})
 app
 .use(Quasar, {
     plugins: {Loading, Dialog}, // import Quasar plugins and add here

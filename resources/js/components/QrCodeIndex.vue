@@ -1,5 +1,4 @@
 <template>
-    <q-badge color="primary" align="middle" label="Unused"></q-badge>
     <LinkQRCode></LinkQRCode>
 
 </template>

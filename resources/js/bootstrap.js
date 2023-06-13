@@ -7,6 +7,62 @@ import 'bootstrap';
  */
 
 import axios from 'axios';
+import {Loading, Notify} from "quasar";
+let requestsPending = 0;
+
+const req = {
+    pending: () => {
+        requestsPending++;
+        Loading.show({
+            message: 'Chargement....',
+            // boxClass: 'bg-grey-2 text-grey-9',
+            spinnerColor: 'primary'
+        })
+
+    },
+    done: () => {
+        requestsPending--;
+        if (requestsPending <= 0) {
+            Loading.hide()
+        }
+    }
+};
+axios.interceptors.request.use(
+    config => {
+        if (typeof config.shouldNotShowLoadingIndicator === 'undefined' &&  !config.shouldNotShowLoadingIndicator){
+            req.pending();
+        }
+
+        return config;
+    },
+    error => {
+        requestsPending--;
+        req.done();
+        return Promise.reject(error);
+    }
+);
+axios.interceptors.response.use(
+    (response) => {
+        req.done();
+        return Promise.resolve(response);
+    },
+    error => {
+        req.done();
+        if(error.response.status === 500) {
+            Notify.create({
+                message: `Une erreur s'est produite au niveau du serveur, la requête n'a pas abouti`,
+                icon: "error",
+                color: 'red',
+                position:"center",
+                textColor: "white",
+                timeout: 1500
+            })
+
+        }
+
+        return Promise.reject(error.response);
+    }
+);
 window.axios = axios;
 
 // window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';

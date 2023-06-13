@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Badge;
 use App\Models\Employe;
+use App\Models\QrCode;
 use App\Rules\PhoneNumber;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Illuminate\Contracts\Foundation\Application;
@@ -51,6 +52,7 @@ class BadgeController extends CrudController
         }
 
         return view('admin.badges_generate', [
+            "unUsedCount"=>QrCode::whereNull("company_id")->count()
         ]);
 
     }

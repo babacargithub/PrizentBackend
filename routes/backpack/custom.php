@@ -30,9 +30,9 @@ Route::group([
     Route::post("badges/link",[BadgeController::class,"linkBadgeWithEmploye"])->name('badges.link');
     Route::get("badges/get_unused/{quantity}",[BadgeController::class,"getUnusedBadges"])->name('badges.get-unused');
     Route::get("qr_codes",[QrCodeAdminController::class,"index"])->name('qr-codes.index');
-    Route::post("link_qr_code",[QrCodeAdminController::class,"link"])->name('qr-codes.link');
-    Route::post("generate_qr_codes",[QrCodeAdminController::class,"generate"])->name('qr-codes.generate');
-    Route::get("unused_qr_codes",[QrCodeAdminController::class,"unused"])->name('qr-codes.unused');
+    Route::any("qr_codes/generate",[QrCodeAdminController::class,"generate"])->name('qr-codes.generate');
+    Route::post("qr_codes/link_qr_code",[QrCodeAdminController::class,"link"])->name('qr-codes.link');
+    Route::get("qr_codes/unused_qr_codes/{quantity}",[QrCodeAdminController::class,"getUnusedQrCodes"])->name('qr-codes.unused');
     Route::get("soldes",[RapportController::class,"soldes"])->name('soldes.solde');
     Route::get("stats",[RapportController::class,"stats"])->name('stats.stats');
 

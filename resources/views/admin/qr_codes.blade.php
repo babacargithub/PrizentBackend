@@ -4,7 +4,9 @@
 @section('content')
     <h6>QR Codes</h6>
     <div id="app">
-        <qr-codes-index>
+
+        <p>Nombre non utilisés {{$unUsedCount}}</p>
+        <qr-codes-index >
         </qr-codes-index>
     </div>
 @endsection
