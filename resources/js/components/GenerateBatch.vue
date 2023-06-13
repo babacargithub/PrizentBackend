@@ -24,12 +24,13 @@
         </div>
     </q-card>
     <q-btn @click="renderImages">Render images</q-btn>
+    <q-btn @click="save">Zip images</q-btn>
 
 
 
     <div ref="images">
         <template v-if="badges.length > 0">
-            <div :key="index" v-for="(badge,index) in badges" :ref="'qr_code_'+index" class="q-card bg-primary row full-width  " style="height: 300px; border-radius: 2%">
+            <div :key="index" v-for="(badge,index) in badges" :ref="'qr_code_'+index" :id="'qr_code_'+index" class="q-card bg-primary row full-width  " style="height: 300px; border-radius: 2%">
                 <div class="col-12 text-center q-pt-lg"><span class="title-medium text-white">Badge Prizent</span></div>
                 <div class="col-5 text-center q-pt-lg">
                     <div class="flex flex-center text-white"><img class="col-4"
@@ -58,7 +59,8 @@ import Swal from "sweetalert2";
 import AlertError from "./AlertError.vue";
 import html2canvas from "html2canvas";
 import QRCode from "qrcode";
-
+import JSZip from "jszip";
+import { saveAs } from 'file-saver';
 export default {
     name: "GenerateBadge",
     components: {AlertError},
@@ -90,25 +92,43 @@ export default {
                 Loading.hide()
             })
         },
-        save(element) {
+        save() {
+            let promises = [];
+            for(let i = 0; i < this.badges.length; i++) {
+                let badge_number = this.badges[i].number
+                let element = document.getElementById('qr_code_'+i);
+                const options = {
+                    type: "dataURL",
+                };
 
-            const options = {
-                type: "dataURL",
-            };
-            html2canvas(element, options).then(canvas=>{
-                // const link = document.createElement("a");
-               return  canvas
-                    .toDataURL("image/png")
+                promises.push( html2canvas(element, options))
 
-                /* link.setAttribute("download", "badge_"+this.employe.fullName +".png");
-                 link.setAttribute(
-                     "href",
-                     canvas
-                         .toDataURL("image/png")
-                         .replace("image/png", "image/octet-stream")
-                 );*/
-                // link.click();
-            });
+            }
+            Promise.allSettled(promises).then(results=>{
+                console.log("badge_"+(this.badges[0].number??'')+".png")
+                let zip = new JSZip();
+                let img = zip.folder("images");
+                for (let i = 0; i < results.length; i++) {
+                 let imgData = results[i].value.toDataURL("image/png").replace("data:image/png;base64,", "");
+
+                img.file("badge-"+i+".gif", imgData, {base64: true});
+
+               }
+
+                zip.generateAsync({type:"blob"})
+                    .then(function(content) {
+                        // see FileSaver.js
+                        saveAs(content, "example.zip");
+                    });
+
+
+               /* html2canvas(element, options).then(canvas => {
+                    // const link = document.createElement("a");
+                    let fileContent = canvas
+                        .toDataURL("image/png").replace("data:image/png;base64,", "")
+                    zipImages(fileContent, "badge_"+badge_number+".png");
+                });*/
+            })
 
 
         },
@@ -135,7 +155,8 @@ export default {
 
             })
 
-        }
+        },
+
     }
 }
 </script>
