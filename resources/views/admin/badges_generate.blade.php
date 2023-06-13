@@ -3,7 +3,7 @@
 @stack('style')
 @section('content')
     <div id="app">
-        <h6>Generate Badges</h6>
+        <h4>Génération de lots ou d'images de badges</h4>
         <generate-badge>
         </generate-badge>
     </div>

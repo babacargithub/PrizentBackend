@@ -12,6 +12,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @property Company $company
+ * @property Badge $badge
  */
 class Employe extends Model
 {

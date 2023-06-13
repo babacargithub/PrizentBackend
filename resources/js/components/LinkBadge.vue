@@ -1,5 +1,4 @@
 <template>
-    <v-container class="container">
         <q-card class="">
             <div class="col-md-8">
                 <div class="card">
@@ -13,7 +12,6 @@
                 </div>
             </div>
         </q-card>
-    </v-container>
 </template>
 
 <script>
