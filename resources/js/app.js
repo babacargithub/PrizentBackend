@@ -6,10 +6,6 @@
 
 import './bootstrap';
 import { createApp } from 'vue';
-import 'vuetify/styles'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 
 import { Quasar } from 'quasar'
 import { Dialog } from 'quasar'
@@ -33,10 +29,6 @@ import 'quasar/src/css/index.sass'
 // and placed in same folder as main.js
 
 
-const vuetify = createVuetify({
-    components,
-    directives,
-})
 /**
  * Next, we will create a fresh Vue application instance. You may then begin
  * registering components with the application instance so they are ready
@@ -45,7 +37,6 @@ const vuetify = createVuetify({
 
 const app = createApp({});
 
-import ExampleComponent from './components/ExampleComponent.vue';
 import BadgesIndex from './components/BadgesIndex.vue';
 import QRCodesIndex from './components/QrCodeIndex.vue';
 import GenerateBadge from './components/GenerateBatch.vue';
@@ -71,8 +62,7 @@ app.component('generate-badge', GenerateBadge);
  * scaffolding. Otherwise, you will need to add an element yourself.
  */
 
-app.use(vuetify)
+app
 .use(Quasar, {
     plugins: {Loading, Dialog}, // import Quasar plugins and add here
-})
-    .mount('#app');
+}).mount('#app');
