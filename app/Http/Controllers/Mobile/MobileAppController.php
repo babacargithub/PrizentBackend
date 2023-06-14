@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use InvalidArgumentException;
@@ -31,11 +32,15 @@ class MobileAppController extends Controller
         return Employe::find($data);
     }
     /**
-     * @param QrCode $qrCode
-     * @return QrCode
+     * @param integer $qrCode
+     * @return QrCode|JsonResponse
      */
-    public function getQrCode(QrCode $qrCode)
+    public function getQrCode($qrCode)
     {
+        $qrCode = QrCode::whereNumber($qrCode)->first();
+        if ($qrCode == null){
+            return  response()->json(["message"=>"QR code introuvable "])->setStatusCode(404);
+        }
         return $qrCode;
     }
     /**
@@ -93,7 +98,7 @@ class MobileAppController extends Controller
     } /**
  * Display the specified resource.
  *
- * @return Model|\Illuminate\Http\JsonResponse
+ * @return Model|JsonResponse
  */
     public function pointerUnBadge(Request $request)
     {

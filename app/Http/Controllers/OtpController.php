@@ -49,6 +49,7 @@ class OtpController extends Controller
             return response()->json(["message"=>"Code invalide !"], 422);
         }
         $employe = Employe::whereTelephone($data["phone_number"])->first();
+        $employe->load("badge");
 
         $device = new Appareil($data["device"]);
         if ($employe->appareils()->count() > 0){
