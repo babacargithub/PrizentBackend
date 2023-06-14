@@ -18,6 +18,7 @@ class QrCodeResource extends JsonResource
      */
     public function toArray($request): array|JsonSerializable|Arrayable
     {
+
         /** @var QrCode $this */
         return [
             "id"=>$this->id,
@@ -26,6 +27,7 @@ class QrCodeResource extends JsonResource
             "longitude"=>$this->longitude,
             "type"=>(string)$this->type,
             "disabled"=>$this->disabled,
+            "number"=>$this->number,
             "qr_code_url"=>"https://app.prizent.pro/qr_code/".$this->id
 
         ];
