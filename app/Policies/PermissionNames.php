@@ -4,15 +4,15 @@ namespace App\Policies;
 
 class PermissionNames
 {
-    const CREATE_COMPANY = "create_company";
-    const CREATE_COMPANY_CEO_ACCOUNT= "create_company_ceo_account";
-    const CREATE_SUPPER_ADMIN_USER= "create_super_admin_user";
-    const VIEW_REPORTS = "view_reports";
-    const CREATE_NEW_USER = "create_new_user";
-    const CHOOSE_POINTER = "choose_pointer";
-    const  RENEW_SUBS = "renew_subs";
-    const  UPDATE_SETTINGS = "update_settings";
-    const  UPDATE_COMPANY_INFO = "change_company_info";
+    const CREATE_COMPANY = "CREER UNE SOCIETE";
+    const CREATE_COMPANY_CEO_ACCOUNT= "CREER COMPTE DIRECTEUR SOCIETE";
+    const CREATE_SUPPER_ADMIN_USER= "CREER COMPTE SUPER ADMIN";
+    const VIEW_REPORTS = "VOIR RAPPORTS";
+    const CREATE_NEW_USER = "CRER UN UTILISATEUR";
+    const CHOOSE_POINTER = "DESIGNER POINTEUR";
+    const  RENEW_SUBS = "RENOUVELER ABONNEMENT";
+    const  UPDATE_SETTINGS = "MODIFIER PARAMETRES";
+    const  UPDATE_COMPANY_INFO = "MODIFIER INFO SOCIETE";
     const  PERMISSION_NAMES = [
         self::CREATE_COMPANY,
         self::CREATE_COMPANY_CEO_ACCOUNT,
