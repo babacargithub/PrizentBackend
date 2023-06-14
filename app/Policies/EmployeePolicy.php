@@ -20,8 +20,6 @@ class EmployeePolicy
      */
     public function viewAny(User $user): Response|bool
     {
-        //
-        //TODO change later
         return true;
 //        return Company::requireLoggedInCompany()->hasActiveSubscription();
 
@@ -36,8 +34,6 @@ class EmployeePolicy
      */
     public function view(User $user, Employe $employee): bool
     {
-        //
-        //TODO change later
         return true;
 //        return $user->id == $employee->company->user->id;
 

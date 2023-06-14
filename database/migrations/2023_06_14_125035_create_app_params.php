@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -12,15 +13,12 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('codes_otp', function (Blueprint $table) {
+        Schema::create('app_params', function (Blueprint $table) {
             $table->id();
-            $table->integer('phone_number')->nullable();
-            $table->integer('email')->nullable();
-            $table->integer('otp')->nullable(false);
-            $table->datetime("expires_at")->nullable(false);
+            $table->integer("maximum_distance")->default(3000);
+            $table->integer("trial_period_days")->default(2);
+            $table->integer("mobile_build_number")->default(1);
             $table->timestamps();
-
-
         });
     }
 
@@ -31,6 +29,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('codes_otp');
+        Schema::dropIfExists('app_params');
     }
 };

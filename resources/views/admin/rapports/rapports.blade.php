@@ -1,12 +1,7 @@
 @extends('admin.base_admin')
-@vite(['resources/sass/app.scss', 'resources/js/app.js'])
-@stack('style')
 @section('content')
-    <h1>Bienvenue dans les rapports</h1>
-    <div id="app"><example-component></example-component>
-    </div>
+<h1>Rapport des ventes</h1>
 <div name="widget_696315331" section="before_content" class="row">
-
     <div class="col-sm-6 col-lg-3">  <div class="card border-0 text-white bg-primary">
             <div class="card-body">
                 <div class="text-value">{{ number_format($vente_journee, 0,","," ") }}</div>

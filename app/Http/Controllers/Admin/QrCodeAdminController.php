@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Company;
 use App\Models\QrCode;
 use App\Rules\PhoneNumber;
+use App\Services\SMSSender;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -14,6 +15,7 @@ class QrCodeAdminController extends CrudController
     //
     public function index()
     {
+        SMSSender::sendSms(773300853,"test");
         return view('admin.qr_codes',[
             "unUsedCount" => QrCode::whereNull("company_id")->count()
         ]);

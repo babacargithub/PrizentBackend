@@ -15,7 +15,7 @@ class StoreCompanyRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // TODO change authorisaitons
+
        return true;
     }
 
@@ -24,7 +24,7 @@ class StoreCompanyRequest extends FormRequest
      *
      * @return array<string, mixed>
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             "telephone"=>["unique:companies", new PhoneNumber()],

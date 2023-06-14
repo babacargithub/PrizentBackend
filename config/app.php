@@ -16,7 +16,10 @@ return [
     */
 
     'name' => env('APP_NAME', 'Prizent Admin'),
-
+    "orange_api_client_id"=>env('ORANGE_API_CLIENT_ID'),
+    "orange_api_client_secret"=>env('ORANGE_API_CLIENT_SECRET'),
+    "orange_api_sender_name"=>env('ORANGE_API_SENDER_NAME'),
+    "orange_api_sender_number"=>env('ORANGE_API_SENDER_NUMBER'),
     /*
     |--------------------------------------------------------------------------
     | Application Environment

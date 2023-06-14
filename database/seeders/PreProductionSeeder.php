@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Abonnement;
 use App\Models\Appareil;
+use App\Models\AppParams;
 use App\Models\Company;
 use App\Models\Employe;
 use App\Models\Entree;
@@ -87,6 +88,7 @@ class PreProductionSeeder extends Seeder
         //
         Artisan::call("db:reset");
         Artisan::call("user:create-super-admin",["email"=>"pdzprizent@gmail.com"]);
+        AppParams::create(["maximum_distance" => 1000]);
 
         $formules = Formule::insert(self::FORMULES);
         $features = Feature::insert(self::FEATURES);

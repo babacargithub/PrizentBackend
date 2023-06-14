@@ -10,9 +10,11 @@ use App\Http\Controllers\OtpController;
 use App\Http\Controllers\QrCodeController;
 use App\Http\Middleware\CheckIfHasActiveSubscription;
 use App\Http\Middleware\MobileAppRequest;
+use App\Models\CodeOtp;
 use App\Models\Company;
 use App\Models\User;
 use App\Rules\PhoneNumber;
+use App\Services\SMSSender;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +31,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 // anonymous and unauthenticated routes
+Route::post('/abonnement/renouveler/wave/success', [AbonnementController::class, "renouvelerAbonnementCallbackWithWave"]);
+
 
 Route::post('/login', function (Request $request){
     $credentials = $request->validate([
@@ -53,6 +57,13 @@ Route::post('/login', function (Request $request){
     }
 
 });
+// OTP Codes
+Route::prefix("mobile/") ->group(function () {
+    Route::post('/fetch_otp', [OtpController::class, "fetchOtp"]);
+
+    Route::post('/check_otp', [OtpController::class, "checkOtp"]
+    );
+});
 Route::post('/request_password_reset', function (Request $request){
     $validated = $request->validate([
         'email' => ['email'],
@@ -61,7 +72,20 @@ Route::post('/request_password_reset', function (Request $request){
     $email = $validated["email"];
     $user = User::whereEmail($email)->first();
     if ($user != null){
-       // TODO Generate and SEND OTP
+        $codeOtp = CodeOtp::create([
+            "otp" => random_int(1111,9999),
+            "expires_at" => Carbon::now()->addMinutes(15),
+            "email"=>$email,
+            "phone_number" => $user->telephone,
+            ]);
+        $otp = $codeOtp->otp;
+        $content = "$otp est votre code OTP de réinitialisation Prizent.";
+        if ($user->telephone != null){
+            SMSSender::sendSms($user->telephone,$content);
+        }else{
+            // send mail
+
+        }
         return response()->json(["message"=>"otp_sent"]);
 
     }
@@ -76,11 +100,15 @@ Route::post('/reset_password', function (Request $request){
         'repeatedPassword' => ["required" ]
     ], [
         "newPassword.required"=>"Le champ nouveau mot de passe est obligatoire"]);
-    //TODO check otp match
     $email = $validated["email"];
     $user = User::whereEmail($email)->first();
     if ($user == null){
         return response()->json(["message"=>"Aucun compete associé avec cet email!"])->setStatusCode(422);
+
+    }
+    $otp = CodeOtp::whereEmail($email)->whereOtp($validated["codeOtp"])->first();
+    if ($otp == null){
+        return response()->json(["message"=>"Code Otp invalide"])->setStatusCode(422);
 
     }
     $user->password = Hash::make($validated["newPassword"]);
@@ -89,12 +117,7 @@ Route::post('/reset_password', function (Request $request){
     return response()->json(["message"=>"reset"]);
 
 });
-Route::prefix("mobile/") ->group(function () {
-    Route::post('/fetch_otp', [OtpController::class, "fetchOtp"]);
 
-    Route::post('/check_otp', [OtpController::class, "checkOtp"]
-    );
-});
 
 // mobile app requests
 Route::prefix("mobile/")
@@ -135,5 +158,5 @@ Route::middleware(["auth:sanctum", CheckIfHasActiveSubscription::class])->group(
 Route::middleware(["auth:sanctum"])->group(function() {
     Route::get('companies/index', [CompanyController::class, "abonnementShow"]);
     Route::post('company/abonner', [AbonnementController::class, "abonnerRequest"]);
-    Route::post('abonnement/{abonnement}/renouveler/initier', [AbonnementController::class, "renouveler"]);
+    Route::post('abonnement/{abonnement}/renouveler/initier', [AbonnementController::class, "renouvelerInitiateRequest"]);
 });

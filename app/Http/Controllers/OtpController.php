@@ -6,6 +6,7 @@ use App\Models\Appareil;
 use App\Models\CodeOtp;
 use App\Models\Employe;
 use App\Rules\PhoneNumber;
+use App\Services\SMSSender;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -23,13 +24,10 @@ class OtpController extends Controller
             return response()->json(["message"=>"Aucun compte lié avec ce numéro !"], 422);
         }
         CodeOtp::wherePhoneNumber($data["phone_number"])->delete();
-        // TODO uncomment this  via SMS
+        $codeOtpGenerated = mt_rand(1111,9999);
+        $qrCode = CodeOtp::create(["otp" => $codeOtpGenerated,"phone_number" => $data["phone_number"],"expires_at" => Carbon::now()->addMinutes(15)]);
 
-//        $codeOtpGenerated = mt_rand(1111,9999);
-        $codeOtpGenerated = 1234;
-        CodeOtp::create(["otp" => $codeOtpGenerated,"phone_number" => $data["phone_number"],"expires_at" => Carbon::now()->addMinutes(15)]);
-
-        // TODO send OTP via SMS
+        SMSSender::sendSms($qrCode->phone_number, $qrCode->otp." est votre code OTP Prizent. Valable pour 15 minutes ");
         return response()->json(["message"=>"otp sent"]);
 
 

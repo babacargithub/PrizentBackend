@@ -30,8 +30,6 @@ class StorePointageBadgeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // TODO if pointage by badge is allowed
-            //TODO verify is pointer is allowed to point
             "employe_id"=>["required","integer",
                 new CompanyHasActiveSubscription(),
               Rule::unique($this->request->get("type",0) == QrCode::TYPE_ENTREE? 'entrees': "sorties")->where(function (Builder $query) {

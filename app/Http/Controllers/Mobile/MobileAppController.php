@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Mobile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePointageRequest;
 use App\Http\Resources\Mobile\EntreeMobileResource;
+use App\Models\Company;
 use App\Models\Employe;
 use App\Models\Entree;
 use App\Models\Journee;
@@ -92,7 +93,7 @@ class MobileAppController extends Controller
     } /**
  * Display the specified resource.
  *
- * @return Model
+ * @return Model|\Illuminate\Http\JsonResponse
  */
     public function pointerUnBadge(Request $request)
     {
@@ -132,6 +133,11 @@ class MobileAppController extends Controller
         ],["employe_id.unique"=>"Cet employé a déjà pointé."]);
 
         $type = $request->input('type');
+        $qrCode =Company::requireLoggedInCompany()->qrCodes()->whereType($type)->first();
+        if ($qrCode == null){
+            return  response()->json(["message"=>"Aucun QR code crée pour la société. Crée un d'abord"])->setStatusCode(422);
+        }
+
 
         if ($type == QrCode::TYPE_ENTREE){
             $pointage = new Entree($request->input());
@@ -143,8 +149,7 @@ class MobileAppController extends Controller
         }
         $journee = Journee::firstOrCreate(["calendrier"=> Carbon::today()->toDateString(), "name" => Carbon::now()->format("d-m-Y")]);
         $pointage->journee()->associate($journee);
-        // TODO improve this later
-        $pointage->qrCode()->associate(QrCode::whereType($type)->first());
+        $pointage->qrCode()->associate($qrCode);
         $pointage->scanned_at = Carbon::now()->toTimeString();
         $pointage->calculerPonctualite();
         $pointage->save();

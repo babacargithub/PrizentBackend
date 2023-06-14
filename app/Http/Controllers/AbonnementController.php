@@ -2,68 +2,74 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AbonnementRequest;
 use App\Http\Requests\RenouvelerAbonnementRequest;
 use App\Models\Abonnement;
-use App\Models\Company;
-use App\Models\Formule;
 use App\Models\Payment;
-use Carbon\Carbon;
+use App\Rules\PhoneNumber;
+use App\Services\SMSSender;
+use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class AbonnementController extends Controller
 {
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param AbonnementRequest $request
-     * @return JsonResponse
-     */
-    public function abonnerRequest(AbonnementRequest $request)
-    {
-        $data = $request->input();
-        //TODO change later and make dynamic
-        $nombre_unites  = 1;
-        $formule_id  = $data["formule_id"];
-        $company_id  = Company::requireLoggedInCompany()->id;
-        $data = [
-            "formule_id"=>$formule_id,
-            "company_id"=>$company_id,
-            "nombre_unites"=>$nombre_unites];
-        $this->saveAbonnerRequest($data);
-
-        // TODO INITIATE payment WAVE or OM
-        return response()->json(["message"=>"INITIATED"]);
-
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @return JsonResponse
-     */
-    public function saveAbonnerRequest($data)
-    {
-        $nombre_unites  = $data["nombre_unites"];
-        $formule_id  = $data["formule_id"];
-        $company_id  = $data["company_id"];
-        $company = Company::find($company_id);
-        $formule = Formule::find($formule_id);
-        $abonnement = new Abonnement();
-        $abonnement->company()->associate($company);
-        $abonnement->formule()->associate($formule);
-        $unite = $formule->unite;
-        if ($unite == "mois"){
-            $abonnement->date_expir = Carbon::now()->addMonths($nombre_unites);
-        }elseif ($unite =="semaine"){
-            $abonnement->date_expir = Carbon::now()->addWeeks($nombre_unites);
-        }
-        $abonnement->save();
-        // TODO Broadcast event new abonnement
-        return response()->json(["message"=>"OK"]);
-
-    }
+//    /**
+//     * Show the form for editing the specified resource.
+//     *
+//     * @param AbonnementRequest $request
+//     * @return JsonResponse
+//     */
+//    public function abonnerRequest(AbonnementRequest $request)
+//    {
+//        $validated = $request->validate([
+//            "formule_id"=>"required|integer",
+//            "nombre_unites"=>"required|numeric",
+//            "telephone"=>["required", new PhoneNumber()],
+//        ]);
+//        $nombre_unites  = $validated["nombre_unites"];
+//        $formule  = Formule::find($validated["formule_id"]);
+//        $company  = Company::requireLoggedInCompany();
+//        $company_id  = $company->id;
+//        $data = [
+//            "formule_id"=>$formule->id,
+//            "company_id"=>$company_id,
+//            "nombre_unites"=>$nombre_unites];
+//
+//        $launch_url = $this->getWavePaymentUrl($company,  $data);
+//        $message = "Vous avez initié un paiement Wave sur Prizent. Cliquez sur le lien suivant pour valider l'opération $launch_url";
+//        SMSSender::sendSms($data["telephone"], $message);
+//        return response()->json(["message"=>"INITIATED"]);
+//
+//    }
+//
+//    /**
+//     * Show the form for editing the specified resource.
+//     *
+//     * @return JsonResponse
+//     */
+//    public function saveAbonnerRequestCallback($data)
+//    {
+//        $nombre_unites  = $data["nombre_unites"];
+//        $formule_id  = $data["formule_id"];
+//        $company_id  = $data["company_id"];
+//        $company = Company::find($company_id);
+//        $formule = Formule::find($formule_id);
+//        $abonnement = new Abonnement();
+//        $abonnement->company()->associate($company);
+//        $abonnement->formule()->associate($formule);
+//        $unite = $formule->unite;
+//        if ($unite == "mois"){
+//            $abonnement->date_expir = Carbon::now()->addMonths($nombre_unites);
+//        }elseif ($unite =="semaine"){
+//            $abonnement->date_expir = Carbon::now()->addWeeks($nombre_unites);
+//        }
+//        $abonnement->save();
+//          $pusherBroadcaster->broadcast(["abonnements"],"renewed");
+//        return response()->json(["message"=>"OK"]);
+//
+//    }
     /**
      * Show the form for editing the specified resource.
      *
@@ -71,32 +77,43 @@ class AbonnementController extends Controller
      * @param RenouvelerAbonnementRequest $request
      * @return JsonResponse
      */
-    public function renouveler(Abonnement $abonnement, RenouvelerAbonnementRequest $request)
+    public function renouvelerInitiateRequest(Abonnement $abonnement, RenouvelerAbonnementRequest $request)
     {
-        $data = $request->input();
-        $nombre_unites  = $data["nombre_unites"];
-        $telephone  = $data["telephone"];
-        $unite = $abonnement->formule->unite;
-        // TODO INITIATE payment WAVE or OM
-        $this->renouvelerEnregistrer($abonnement, $data);
-        return response()->json(["message"=>"INITIATED"]);
+        $validated = $request->validate([
+            "nombre_unites"=>"required|numeric",
+            "telephone"=>["required", new PhoneNumber()],
+        ]);
+        $formule  =  $abonnement->formule;
+        $nombre_unites  = $validated["nombre_unites"];
+        $montant =  (integer)($formule->prix * (integer) $nombre_unites);
+
+        $launch_url = $this->getWavePaymentUrl($montant, [
+            "abonnement_id"=>$abonnement->id,
+            "nombre_unites"=>$validated["nombre_unites"],
+            "montant"=>$montant
+            ]);
+        $message = "Vous avez initié un paiement Wave sur Prizent. Cliquez sur le lien suivant pour valider l'opération $launch_url";
+        SMSSender::sendSms($validated["telephone"], $message);
+        return response()->json(["message"=>"INITIATED","launch_url"=>$launch_url]);
 
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param Abonnement $abonnement
-     * @param $data
+     * @param Request $request
+     * @param PusherBroadcaster $pusherBroadcaster
      * @return JsonResponse
      */
-    public function renouvelerEnregistrer(Abonnement $abonnement,  $data)
+    public function renouvelerAbonnementCallbackWithWave(Request $request, PusherBroadcaster $pusherBroadcaster)
     {
+        $data = $request->input("data");
+        $abonnement = Abonnement::find($data["abonnement_id"]);
         $payment = new Payment();
         $payment->abonnement()->associate($abonnement);
-        //TODO change these 2 values
-        $payment->paye_par = "";
-        $payment->montant = 2000;
+        $montant = $data["montant"];
+        $payment->paye_par = "WAVE";
+        $payment->montant = $montant;
         $payment->save();
 
         $nombre_unites  = $data["nombre_unites"];
@@ -107,8 +124,25 @@ class AbonnementController extends Controller
             $abonnement->date_expir = $abonnement->date_expir->addWeeks($nombre_unites);
         }
         $abonnement->save();
+        $pusherBroadcaster->broadcast(["abonnements"],"renewed");
 
         return response()->json(["message"=>"INITIATED"]);
 
+    }
+
+    public   function getWavePaymentUrl($montant,  array $data): ?string
+    {
+        //
+        $url = "https://golobone.net/go_travel_v4/public/api/mobile/digipress_wave_url";
+        $data = [
+            "amount"=> $montant,
+            "currency" => "XOF",
+            "client_reference"=>json_encode(["type"=>"prizent","data"=>json_encode($data)]),
+            "error_url" => "https://prizent.sn",
+            "success_url" =>"https://prizent.sn",
+        ];
+        $response = Http::post($url,$data);
+        $res = json_decode($response->body(),true);
+        return $res["wave_launch_url"]?? null;
     }
 }
