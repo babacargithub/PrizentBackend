@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreQrCodeRequest;
 use App\Http\Requests\UpdateQrCodeRequest;
 use App\Http\Resources\QrCodeResource;
+use App\Models\AppParams;
 use App\Models\Company;
 use App\Models\QrCode;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -34,6 +35,9 @@ class QrCodeController extends Controller
     public function store(StoreQrCodeRequest $request)
     {
         $QrCode = new  QrCode($request->input());
+        $max = (integer) QrCode::max("number");
+        $QrCode->number =  $max> 0? $max+1 : 20001;
+        $QrCode->maximum_distance = AppParams::first()->maximum_distance;
         $QrCode->company()->associate(Company::requireLoggedInCompany());
         $QrCode->save();
 

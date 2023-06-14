@@ -11,6 +11,9 @@ class Payment extends Model
 {
     use CrudTrait;
     use HasFactory;
+    const PAYEMENT_METHOD_WAVE = "WAVE",
+        PAYMENT_METHOD_OM = "OM",
+        PAYMENT_METHOD_CASH = "CASH";
     protected $fillable = ["montant","paye_par"];
 
     public function abonnement(): BelongsTo

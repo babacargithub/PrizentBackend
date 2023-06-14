@@ -11,6 +11,7 @@ use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\Rule;
 
 class AbonnementController extends Controller
 {
@@ -80,23 +81,29 @@ class AbonnementController extends Controller
     public function renouvelerInitiateRequest(Abonnement $abonnement, RenouvelerAbonnementRequest $request)
     {
         $validated = $request->validate([
+            "methode_paiement"=>["required", Rule::in(["OM","WAVE","CASH"])],
             "nombre_unites"=>"required|numeric",
             "telephone"=>["required", new PhoneNumber()],
         ]);
         $formule  =  $abonnement->formule;
         $nombre_unites  = $validated["nombre_unites"];
         $montant =  (integer)($formule->prix * (integer) $nombre_unites);
-
-        $launch_url = $this->getWavePaymentUrl($montant, [
-            "abonnement_id"=>$abonnement->id,
-            "nombre_unites"=>$validated["nombre_unites"],
-            "montant"=>$montant
+        if ($validated["methode_paiement"] == Payment::PAYEMENT_METHOD_WAVE){
+            $launch_url = $this->getWavePaymentUrl($montant, [
+                "abonnement_id"=>$abonnement->id,
+                "nombre_unites"=>$validated["nombre_unites"],
+                "montant"=>$montant
             ]);
-        $message = "Vous avez initié un paiement Wave sur Prizent. Cliquez sur le lien suivant pour valider l'opération $launch_url";
-        SMSSender::sendSms($validated["telephone"], $message);
-        return response()->json(["message"=>"INITIATED","launch_url"=>$launch_url]);
-
-    }
+            $message = "Vous avez initié un paiement Wave sur Prizent. Cliquez sur le lien suivant pour valider l'opération $launch_url";
+            SMSSender::sendSms($validated["telephone"], $message);
+            return response()->json(["message"=>"INITIATED","launch_url"=>$launch_url]);
+        }else if ($validated["methode_paiement"] == Payment::PAYMENT_METHOD_OM) {
+            // TODO finish the job
+            $this->triggerOMPayement($montant, $validated);
+            return  response()->json(["message"=>"OK"]);
+        }
+        return  response()->json(["Initiated"=>"OK"]);
+        }
 
     /**
      * Show the form for editing the specified resource.
@@ -144,5 +151,10 @@ class AbonnementController extends Controller
         $response = Http::post($url,$data);
         $res = json_decode($response->body(),true);
         return $res["wave_launch_url"]?? null;
+    }
+
+    private function triggerOMPayement(int $montant, array $data)
+    {
+        // TODO OM payment
     }
 }

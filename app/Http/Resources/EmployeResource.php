@@ -38,7 +38,8 @@ class EmployeResource extends JsonResource
             "telephone"=>$this->telephone,
             "email"=>$this->email,
             "sexe"=>$this->sexe,
-            "badge_autorise"=>(bool)$this->badge_autorise,
+            "badge_autorise"=>$this->badge !== null && $this->badge->disabled == false,
+            "badge"=>$this->badge,
             "appareils"=>$this->appareils,
             "horaires"=>HoraireEmployeResource::collection($this->horaires)
         ];

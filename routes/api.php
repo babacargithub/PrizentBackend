@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AbonnementController;
+use App\Http\Controllers\Admin\BadgeController;
 use App\Http\Controllers\AppareilController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmployeeController;
@@ -138,6 +139,7 @@ Route::middleware(["auth:sanctum", CheckIfHasActiveSubscription::class])->group(
     Route::get("pointages/{date}",[JourneeController::class,"pointages"]);
     Route::get('employes/{employe}/rapport/{dateStart}/{dateEnd}', [EmployeeController::class,"rapport"]);
     Route::get('employes/rankings/{dateStart}/{dateEnd}', [EmployeeController::class,"rankings"]);
+    Route::post("badges/link",[BadgeController::class,"linkBadgeWithEmploye"])->name('badges.link');
     Route::get('companies/pointeurs', [CompanyController::class,"pointeurs"]);
     Route::put('companies/params', [CompanyController::class,"updateParams"]);
     Route::put('companies/update', [CompanyController::class,"update"]);
