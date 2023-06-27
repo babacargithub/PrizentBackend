@@ -107,7 +107,11 @@ class EmployeeController extends Controller
                 $query->whereBetween("calendrier", [$dateStart, $dateEnd]); }
             )->where("ponctualite",'>=',0)
             ->sum("ponctualite");
-        $journeesIds = Journee::select('id')->whereBetween("calendrier",[$dateStart,$dateEnd])->whereFerie(false)->get()->toArray();
+        $journeesIds = Journee::select('id')
+            ->whereBetween("calendrier",[$dateStart,$dateEnd])
+            ->whereFerie(false)
+            ->whereDate('calendrier',">=", $employe->created_at->toDateString())
+            ->get()->toArray();
         $joursAbsentes =  0;
         foreach ($journeesIds as $journeesId) {
             $entree = Entree::where("employe_id", $employe->id)

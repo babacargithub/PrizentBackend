@@ -109,7 +109,6 @@ class MobileAppController extends Controller
             "employe_id"=>[
                 "required",
                 "integer",
-                new CompanyHasActiveSubscription(),
                 Rule::unique($request->get("type",0) == QrCode::TYPE_ENTREE? 'entrees': "sorties")->where(function (Builder $query) use ($request) {
                     $query->where('employe_id', $request->get("employe_id",0));
                     $query->where("journee_id", Journee::today()->id);
@@ -123,6 +122,10 @@ class MobileAppController extends Controller
                     $pointeur = Employe::requiredLoggedInEmploye();
                     if (! $pointeur->pointeur){
                         $fail("Vous n'êtes pas autorisé à pointer des badges.");
+
+                    }
+                    if (! $pointeur->company->hasActiveSubscription()){
+                        $fail("Le compte Prizent de votre société n'est pas actif. Abonnement expiré.");
 
                     }
 
@@ -158,7 +161,7 @@ class MobileAppController extends Controller
          },]);
 
         $type = $validated['type'];
-        $qrCode = Company::requireLoggedInCompany()->qrCodes()->whereType($type)->first();
+        $qrCode = Employe::requiredLoggedInEmploye()->company->qrCodes()->whereType($type)->first();
         if ($qrCode == null){
             return  response()->json(["message"=>"Aucun QR code crée pour la société. Crée un d'abord"])->setStatusCode(422);
         }
@@ -174,6 +177,8 @@ class MobileAppController extends Controller
         }
         $journee = Journee::firstOrCreate(["calendrier"=> Carbon::today()->toDateString(), "name" => Carbon::now()->format("d-m-Y")]);
         $pointage->journee()->associate($journee);
+        $employe = Employe::whereId($validated["employe_id"])->orWhereRelation("badge","number",$validated["employe_id"])->first();
+        $pointage->employe()->associate($employe);
         $pointage->qrCode()->associate($qrCode);
         $pointage->scanned_at = Carbon::now()->toTimeString();
         $pointage->calculerPonctualite();

@@ -58,8 +58,11 @@ class Company extends Model
     }
 
     public static  function requireLoggedInCompany() : Company {
-
-        $company = Company::where('user_id',request()->user()->id)->first();
+        $user = request()->user();
+        if ($user == null){
+            throw new NotFoundHttpException("User is null unable to find company with user account id");
+        }
+        $company = Company::where('user_id', $user->id)->first();
         if ($company == null){
             $company = Company::whereRelation("users",'users.id',request()->user()->id)->first();
             if ($company == null){
