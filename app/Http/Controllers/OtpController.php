@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appareil;
+use App\Models\AppParams;
 use App\Models\CodeOtp;
 use App\Models\Employe;
 use App\Rules\PhoneNumber;
@@ -34,7 +35,7 @@ class OtpController extends Controller
     }
     public function checkOtp(Request $request){
         $data = $request->validate([
-            'otp' => "required|integer|max_digits:4|min_digits:4",
+            'otp' => "required|integer|digits:4",
             'phone_number' => ["required", new PhoneNumber()],
             "device"=> "required|array"
 
@@ -43,8 +44,9 @@ class OtpController extends Controller
             ->whereOtp($data['otp'])
             ->first();
         if ($otpCode != null){
-            if($otpCode->expired())
-            return response()->json(["message"=>"Code expiré !"], 422);
+            if($otpCode->expired()) {
+                return response()->json(["message" => "Le code de confirmation a expiré !"], 422);
+            }
         }else{
             return response()->json(["message"=>"Code invalide !"], 422);
         }
@@ -65,8 +67,8 @@ class OtpController extends Controller
         }else{
             $employe->appareils()->save($device);
         }
-
-        return response()->json(["message"=>"otp ok","employe"=>$employe]);
+        $app_params = AppParams::first()->toArray();
+        return response()->json(["message"=>"otp ok","employe"=>$employe, "app_params"=>$app_params]);
 
     }
 }

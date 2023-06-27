@@ -13,4 +13,9 @@ class Badge extends Model
         return $this->belongsTo(Employe::class);
 
     }
+
+    public function isDisabled(): bool
+    {
+        return (bool) $this->attributes["disabled"];
+    }
 }

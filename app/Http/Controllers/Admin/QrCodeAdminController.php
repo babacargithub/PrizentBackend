@@ -26,8 +26,8 @@ class QrCodeAdminController extends CrudController
             "company_telephone"=>["required", new PhoneNumber(false)],
             "qr_code_number"=>["required", "int"],
             "nom"=>"required|string",
-            "latitude"=>['decimal:7'],
-            "longitude"=>['decimal:7'],
+            "latitude"=>['numeric'],
+            "longitude"=>['numeric'],
             ],
             ["latitude.decimal"=>"Le champ latitude doit être un nombre décimal avec 7 chiffres après la virgule",
             "longitude.decimal"=>"Le champ longitude doit être un nombre décimal avec 7 chiffres après la virgule"],
@@ -40,16 +40,19 @@ class QrCodeAdminController extends CrudController
                 $fail("Aucune société  avec ce numéro de téléphone");
             }
 
-        },"qr_code_number"=> function($attribute,$value, $fail) use ($validated) {
+        },"qr_code_number"=> function($attribute,$value, $fail) use ($validated,$company) {
 
             if (null == QrCode::whereNumber($validated["qr_code_number"])->first()){
                 $fail("Ce numéro de Qr code n'existe pas");
             }
-            if (null != QrCode::whereNumber($validated["qr_code_number"])->whereNotNull('company_id')->first()){
+            $qr =  QrCode::whereNumber($validated["qr_code_number"])->whereNotNull('company_id')->first();
+            if (null != $qr){
+                if ($qr->company_id !== $company->id)
                 $fail("Ce qr code est déjà attribué");
             }
         }]);
         $qrCode = QrCode::whereNumber($validated["qr_code_number"])->first();
+        $qrCode->update($validated);
         $qrCode->company()->associate($company);
         $qrCode->save();
         return  response()->json(["message"=>"OK"]);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Mobile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePointageRequest;
 use App\Http\Resources\Mobile\EntreeMobileResource;
+use App\Models\Badge;
 use App\Models\Company;
 use App\Models\Employe;
 use App\Models\Entree;
@@ -31,13 +32,14 @@ class MobileAppController extends Controller
     {
         return Employe::find($data);
     }
+
     /**
-     * @param integer $qrCode
+     * @param $qrCodeNumber
      * @return QrCode|JsonResponse
      */
-    public function getQrCode($qrCode)
+    public function getQrCode($qrCodeNumber)
     {
-        $qrCode = QrCode::whereNumber($qrCode)->first();
+        $qrCode = QrCode::whereNumber($qrCodeNumber)->first();
         if ($qrCode == null){
             return  response()->json(["message"=>"QR code introuvable "])->setStatusCode(404);
         }
@@ -102,7 +104,7 @@ class MobileAppController extends Controller
  */
     public function pointerUnBadge(Request $request)
     {
-         $request->validate([
+         $validated = $request->validate([
             "badge_physique"=>"required|boolean",
             "employe_id"=>[
                 "required",
@@ -111,15 +113,7 @@ class MobileAppController extends Controller
                 Rule::unique($request->get("type",0) == QrCode::TYPE_ENTREE? 'entrees': "sorties")->where(function (Builder $query) use ($request) {
                     $query->where('employe_id', $request->get("employe_id",0));
                     $query->where("journee_id", Journee::today()->id);
-                }),
-                function (string $attribute, mixed $value, Closure $fail) use ($request) {
-                    $employe_id  = $request->input('employe_id');
-                    $employe = Employe::find($employe_id);
-                    if ($request->input("badge_physique") && !$employe->isBadgeAllowed()){
-                        $fail("Le pointage par badge physique n'est pas autorisé pour cet employé!");
-
-                    }
-                },
+                })
             ],
             "type"=>["required","integer",
                 Rule::in([1, 2]),
@@ -136,9 +130,35 @@ class MobileAppController extends Controller
 
             ],
         ],["employe_id.unique"=>"Cet employé a déjà pointé."]);
+         $request->validate(["employe_id"=> function (string $attribute, mixed $value, Closure $fail) use ($request, $validated) {
+             $employe_id  = $validated['employe_id'];
+             if ($validated["badge_physique"]){
 
-        $type = $request->input('type');
-        $qrCode =Company::requireLoggedInCompany()->qrCodes()->whereType($type)->first();
+             $badge = Badge::whereNumber($employe_id)->first();
+             if ($badge == null){
+                 $fail("Ce badge n'existe pas");
+
+             }else{
+                 if ($badge->isDisabled()){
+                     $fail("Ce badge n'est pas activé !");
+
+                 }else{
+                     $employe = $badge->employe;
+                     if ($employe == null){
+                         $fail("Ce badge n'est attribué à aucun employé ");
+
+                     }
+
+                 }
+             }
+
+
+             }
+
+         },]);
+
+        $type = $validated['type'];
+        $qrCode = Company::requireLoggedInCompany()->qrCodes()->whereType($type)->first();
         if ($qrCode == null){
             return  response()->json(["message"=>"Aucun QR code crée pour la société. Crée un d'abord"])->setStatusCode(422);
         }

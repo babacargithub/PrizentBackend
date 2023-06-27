@@ -17,6 +17,8 @@ class Feature extends Model
     const FEATURE_SMS_NOTIFICATIONS = "sms_notifications";
     const FEATURE_REPORT_EXPORT = "report_export";
     const FEATURE_MULTIPLE_ACCOUNT = "multiple_account";
+    const FEATURE_GPS_LOCATION_CHECK = "gps_location_check";
+
     public function formules() : BelongsToMany {
         return  $this->belongsToMany(Formule::class);
     }

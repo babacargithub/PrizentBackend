@@ -25,7 +25,7 @@ class EntreeMobileResource extends JsonResource
     public function toArray($request): array|JsonSerializableAlias|Arrayable
     {
         return [
-            "journee"=>$this->journee->calendrier->format('D-d-Y'),
+            "journee"=>$this->journee->calendrier->format('Y-m-d'),
             "ferie"=>$this->journee->ferie,
             "scanned_at"=>Carbon::createFromFormat('H:i:s',$this->scanned_at)->format("H:i"),
             "ponctualite"=>$this->ponctualite

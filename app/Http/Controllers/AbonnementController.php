@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RenouvelerAbonnementRequest;
 use App\Models\Abonnement;
+use App\Models\Formule;
 use App\Models\Payment;
 use App\Rules\PhoneNumber;
 use App\Services\SMSSender;
@@ -11,6 +12,7 @@ use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class AbonnementController extends Controller
@@ -81,14 +83,21 @@ class AbonnementController extends Controller
     public function renouvelerInitiateRequest(Abonnement $abonnement, RenouvelerAbonnementRequest $request)
     {
         $validated = $request->validate([
-            "methode_paiement"=>["required", Rule::in(["OM","WAVE","CASH"])],
+            "methode_paiement"=>["required",function($value, $attribute, $fail){
+
+            if (strtolower($value) == "om"){
+                $fail("Le paiement par Orange Money n'est pas encore activé. Veuillez utiliser Wave");
+            }else if (strtolower($value) == "cash"){
+                $fail("Le paiement par Cash n'est pas encore autorisé. Veuillez utiliser Wave");
+            }
+            }],
             "nombre_unites"=>"required|numeric",
             "telephone"=>["required", new PhoneNumber()],
         ]);
         $formule  =  $abonnement->formule;
         $nombre_unites  = $validated["nombre_unites"];
         $montant =  (integer)($formule->prix * (integer) $nombre_unites);
-        if ($validated["methode_paiement"] == Payment::PAYEMENT_METHOD_WAVE){
+        if (Str::lower($validated["methode_paiement"]) == Str::lower(Payment::PAYEMENT_METHOD_WAVE)){
             $launch_url = $this->getWavePaymentUrl($montant, [
                 "abonnement_id"=>$abonnement->id,
                 "nombre_unites"=>$validated["nombre_unites"],
@@ -98,9 +107,7 @@ class AbonnementController extends Controller
             SMSSender::sendSms($validated["telephone"], $message);
             return response()->json(["message"=>"INITIATED","launch_url"=>$launch_url]);
         }else if ($validated["methode_paiement"] == Payment::PAYMENT_METHOD_OM) {
-            // TODO finish the job
-            $this->triggerOMPayement($montant, $validated);
-            return  response()->json(["message"=>"OK"]);
+            return  response()->json(["message"=>"Paiement par Orange Money pas encore fonctionnel pour le moment. Choisissez Wave"])->setStatusCode(422);
         }
         return  response()->json(["Initiated"=>"OK"]);
         }
@@ -153,8 +160,13 @@ class AbonnementController extends Controller
         return $res["wave_launch_url"]?? null;
     }
 
-    private function triggerOMPayement(int $montant, array $data)
+    private function triggerOMPayement( array $data): void
     {
-        // TODO OM payment
+        $formule = Formule::find($data["formule_id"]);
+        $montant = (integer) ($formule->prix * (integer)$data ["nombre_unites"]);
+        $data["montant"] = $montant;
+        $response = Http::post('https://golobone.net/paymenent/om/for_prizent', $data);
+
+        $response["message"];
     }
 }

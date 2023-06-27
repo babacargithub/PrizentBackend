@@ -11,6 +11,7 @@ use App\Http\Controllers\OtpController;
 use App\Http\Controllers\QrCodeController;
 use App\Http\Middleware\CheckIfHasActiveSubscription;
 use App\Http\Middleware\MobileAppRequest;
+use App\Models\AppParams;
 use App\Models\CodeOtp;
 use App\Models\Company;
 use App\Models\User;
@@ -34,6 +35,9 @@ use Illuminate\Support\Facades\Route;
 // anonymous and unauthenticated routes
 Route::post('/abonnement/renouveler/wave/success', [AbonnementController::class, "renouvelerAbonnementCallbackWithWave"]);
 
+Route::get('app_params', function (){
+    return AppParams::first();
+});
 
 Route::post('/login', function (Request $request){
     $credentials = $request->validate([
@@ -67,9 +71,8 @@ Route::prefix("mobile/") ->group(function () {
 });
 Route::post('/request_password_reset', function (Request $request){
     $validated = $request->validate([
-        'email' => ['email'],
-        'telephone' => ["nullable", new PhoneNumber()]
-    ]);
+        'email' => ['required|email']]);
+
     $email = $validated["email"];
     $user = User::whereEmail($email)->first();
     if ($user != null){
@@ -80,11 +83,13 @@ Route::post('/request_password_reset', function (Request $request){
             "phone_number" => $user->telephone,
             ]);
         $otp = $codeOtp->otp;
-        $content = "$otp est votre code OTP de réinitialisation Prizent.";
+        $content = "$otp est le code de réinitialisation de votre compte Prizent.";
         if ($user->telephone != null){
             SMSSender::sendSms($user->telephone,$content);
         }else{
             // send mail
+            // TODO check email is sent
+            Mail::to($user);
 
         }
         return response()->json(["message"=>"otp_sent"]);
@@ -104,18 +109,23 @@ Route::post('/reset_password', function (Request $request){
     $email = $validated["email"];
     $user = User::whereEmail($email)->first();
     if ($user == null){
-        return response()->json(["message"=>"Aucun compete associé avec cet email!"])->setStatusCode(422);
+        return response()->json(["message"=>"Aucun compete associé avec cet email !"])->setStatusCode(422);
 
     }
     $otp = CodeOtp::whereEmail($email)->whereOtp($validated["codeOtp"])->first();
     if ($otp == null){
-        return response()->json(["message"=>"Code Otp invalide"])->setStatusCode(422);
+        return response()->json(["message"=>"Code Otp invalide !"])->setStatusCode(422);
 
     }
+    if ($otp->expired()){
+        return response()->json(["message"=>"Code de confirmation a expiré !"])->setStatusCode(422);
+
+    }
+
     $user->password = Hash::make($validated["newPassword"]);
     $user->save();
 
-    return response()->json(["message"=>"reset"]);
+    return response()->json(["message"=>"reset OK"]);
 
 });
 
@@ -125,7 +135,7 @@ Route::prefix("mobile/")
     ->middleware([MobileAppRequest::class])
     ->group(function (){
         Route::get('employes/{id}', [MobileAppController::class, "employe"]);
-        Route::get('qr_code_scanned/{qrCode}', [MobileAppController::class, "getQrCode"]);
+        Route::get('qr_code_scanned/{qrCodeNumber}', [MobileAppController::class, "getQrCode"]);
         Route::post('pointage', [MobileAppController::class, "pointer"]);
         Route::post('pointage_badge', [MobileAppController::class, "pointerUnBadge"]);
         Route::get('pointages', [MobileAppController::class, "pointages"]);
