@@ -121,7 +121,7 @@ class AbonnementController extends Controller
      */
     public function renouvelerAbonnementCallbackWithWave(Request $request, PusherBroadcaster $pusherBroadcaster)
     {
-        $data = $request->input("data");
+        $data = json_decode($request->getContent(), true)["data"];
         $abonnement = Abonnement::find($data["abonnement_id"]);
         $payment = new Payment();
         $payment->abonnement()->associate($abonnement);
@@ -152,8 +152,8 @@ class AbonnementController extends Controller
             "amount"=> $montant,
             "currency" => "XOF",
             "client_reference"=>json_encode(["type"=>"prizent","data"=>json_encode($data)]),
-            "error_url" => "https://prizent.sn",
-            "success_url" =>"https://prizent.sn",
+            "error_url" => "https://prizent.tech",
+            "success_url" =>"https://prizent.tech",
         ];
         $response = Http::post($url,$data);
         $res = json_decode($response->body(),true);
