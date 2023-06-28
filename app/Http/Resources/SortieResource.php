@@ -26,7 +26,7 @@ class SortieResource extends JsonResource
     {
         return [
             "employe"=>$this->employe,
-            "scanned_at"=>Carbon::createFromFormat("H:m:s", $this->scanned_at)->format('H:m'),
+            "scanned_at"=>Carbon::createFromFormat("H:i:s", $this->scanned_at)->format('H:i'),
             "ponctualite"=>$this->ponctualite
             ];
     }
