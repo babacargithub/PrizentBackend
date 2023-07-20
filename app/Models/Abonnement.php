@@ -13,7 +13,7 @@ class Abonnement extends Model
 {
     use CrudTrait;
     use HasFactory;
-    protected $fillable =["date_expir"];
+    protected $fillable =["date_expir","formule_id"];
     protected $casts = ["date_expir" => "datetime"];
     public function company(): BelongsTo
     {
