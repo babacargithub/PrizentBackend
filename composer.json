@@ -13,7 +13,7 @@
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
         "laravel/ui": "^4.2",
-        "mediumart/orange-sms": "^2.0",
+        "mediumart/orange-sms": "^1.0",
         "spatie/laravel-permission": "^5.10"
     },
     "require-dev": {

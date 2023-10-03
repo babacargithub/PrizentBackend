@@ -36,4 +36,5 @@ Route::group([
     Route::get("soldes",[RapportController::class,"soldes"])->name('soldes.solde');
     Route::get("stats",[RapportController::class,"stats"])->name('stats.stats');
 
+    Route::crud('commercial', 'CommercialCrudController');
 }); // this should be the absolute last line of this file

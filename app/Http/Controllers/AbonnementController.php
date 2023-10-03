@@ -119,7 +119,7 @@ class AbonnementController extends Controller
      * @param PusherBroadcaster $pusherBroadcaster
      * @return JsonResponse
      */
-    public function renouvelerAbonnementCallbackWithWave(Request $request, PusherBroadcaster $pusherBroadcaster)
+    public function renouvelerAbonnementCallbackWithWave(Request $request, PusherBroadcaster $pusherBroadcaster): JsonResponse
     {
         $data = json_decode($request->getContent(), true)["data"];
         $abonnement = Abonnement::find($data["abonnement_id"]);
@@ -152,8 +152,8 @@ class AbonnementController extends Controller
             "amount"=> $montant,
             "currency" => "XOF",
             "client_reference"=>json_encode(["type"=>"prizent","data"=>json_encode($data)]),
-            "error_url" => "https://prizent.tech",
-            "success_url" =>"https://prizent.tech",
+            "error_url" => "https://client.prizent.tech",
+            "success_url" =>"https://client.prizent.tech",
         ];
         $response = Http::post($url,$data);
         $res = json_decode($response->body(),true);

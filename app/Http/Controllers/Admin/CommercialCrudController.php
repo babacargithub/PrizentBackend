@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use Alert;
-use App\Http\Requests\CompanyRequest;
+use App\Http\Requests\CommercialRequest;
 use App\Http\Requests\StoreCompanyRequest;
 use App\Models\Abonnement;
+use App\Models\Commercial;
 use App\Models\Company;
 use App\Models\Formule;
 use App\Models\Params;
@@ -23,11 +24,11 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 
 /**
- * Class CompanyCrudController
+ * Class CommercialCrudController
  * @package App\Http\Controllers\Admin
  * @property-read CrudPanel $crud
  */
-class CompanyCrudController extends CrudController
+class CommercialCrudController extends CrudController
 {
     use ListOperation;
     use CreateOperation;
@@ -37,13 +38,14 @@ class CompanyCrudController extends CrudController
 
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
+     *
      * @return void
      */
     public function setup()
     {
-        CRUD::setModel(Company::class);
-        CRUD::setRoute(config('backpack.base.route_prefix') . '/company');
-        CRUD::setEntityNameStrings('Société', 'Sociétés');
+        CRUD::setModel(Commercial::class);
+        CRUD::setRoute(config('backpack.base.route_prefix') . '/commercial');
+        CRUD::setEntityNameStrings('commercial', 'commercials');
     }
 
     /**
@@ -51,16 +53,13 @@ class CompanyCrudController extends CrudController
      *
      * @see  https://backpackforlaravel.com/docs/crud-operation-list-entries
      * @return void
-     * @noinspection PhpUnused
      */
     protected function setupListOperation()
     {
         CRUD::column('nom');
-        CRUD::column('telephone')->label("Contact");
+        CRUD::column('telephone');
         CRUD::column('email');
-        CRUD::column('latitude');
-        CRUD::column('longitude');
-
+        CRUD::column('sexe');
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:
@@ -77,14 +76,15 @@ class CompanyCrudController extends CrudController
      */
     protected function setupCreateOperation()
     {
-        CRUD::setValidation(CompanyRequest::class);
+        CRUD::setValidation([
+            // 'name' => 'required|min:2',
+        ]);
+
         CRUD::field('nom');
-        CRUD::field('email');
         CRUD::field('telephone');
-        CRUD::field('adresse');
-        CRUD::field('region');
-        CRUD::field('latitude');
-        CRUD::field('longitude');
+        CRUD::field('email');
+        CRUD::field('sexe');
+        $this->crud->setValidation(CommercialRequest::class);
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:
@@ -98,46 +98,32 @@ class CompanyCrudController extends CrudController
      *
      * @see https://backpackforlaravel.com/docs/crud-operation-update
      * @return void
-     * @noinspection PhpUnused
      */
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
     }
-
-    public function store(StoreCompanyRequest $request)
+    public function store(CommercialRequest $request)
     {
-        $company = new Company($this->crud->getStrippedSaveRequest($request));
+        $commercial = new Commercial($this->crud->getStrippedSaveRequest($request));
         $userAccount = new User();
-        $userAccount->email = $company->email;
-        $userAccount->name = $company->nom;
+        $userAccount->email = $commercial->email;
+        $userAccount->name = $commercial->nom;
         $userAccount->email_verified_at = Carbon::now();
         $userAccount->password = Hash::make("0000");
         $userAccount->save();
-        $userAccount->assignRole(RoleNames::ROLE_COMPANY_CEO);
-        $userAccount->telephone = $company->telephone;
-        $company->user()->associate($userAccount);
-        $company->save();
-        $abonnement = new Abonnement(["date_expir" => Carbon::now()->addDays(2)->toDateTimeString()]);
-        $abonnement->formule()->associate(Formule::first());
-        $abonnement->company()->associate($company);
-        $abonnement->save();
+        $userAccount->assignRole(RoleNames::ROLE_PRIZENT_EMPLOYEE);
+        $userAccount->telephone = $commercial->telephone;
+        $commercial->user()->associate($userAccount);
+        $commercial->save();
         $userAccount->save();
         // create params
-        $params = Params::all();
-
-        foreach ($params as $param) {
-            $company->params()->save($param);
-        }
-        //TODO create entry data for the the salesperson who created it
-
         // show a success message
         Alert::success(trans('backpack::crud.insert_success'))->flash();
 
         // save the redirect choice for next time
         $this->crud->setSaveAction();
 
-        return $this->crud->performSaveAction($company->getKey());
+        return $this->crud->performSaveAction($commercial->getKey());
     }
-
 }

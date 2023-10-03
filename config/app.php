@@ -1,6 +1,8 @@
 <?php
 
+use App\Services\SMSRequest;
 use Illuminate\Support\Facades\Facade;
+use Mediumart\Orange\SMS\Http\Requests\OutboundSMSRequest;
 
 return [
 
@@ -214,7 +216,7 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
-        // 'ExampleClass' => App\Example\ExampleClass::class,
+        OutboundSMSRequest::class => SMSRequest::class,
     ])->toArray(),
 
 ];

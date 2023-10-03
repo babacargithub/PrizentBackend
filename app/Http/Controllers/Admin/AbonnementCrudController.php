@@ -54,7 +54,7 @@ class AbonnementCrudController extends CrudController
        $this->crud->addColumn(["label"=>"Formule","type"=>"entity", "relation"=>"formule","attribute"=>"nom"]);
         CRUD::column('date_expir')->label("Expire le");
 
-        $this->crud->removeAllButtonsFromStack("top");
+//        $this->crud->removeAllButtonsFromStack("top");
 
 
         /**
@@ -77,7 +77,28 @@ class AbonnementCrudController extends CrudController
         'date_expir' => 'date',
     ]);
 
-        CRUD::field('date_expir');
+        CRUD::field('prix')
+            ->type("number")
+            ->label("Prix de l'abonnement");
+        $this->crud->addField([
+            // Select
+            'label'     => "Société",
+            'type'      => 'select',
+            'name'      => 'company_id', // the db column for the foreign key
+
+            // optional
+            // 'entity' should point to the method that defines the relationship in your Model
+            // defining entity will make Backpack guess 'model' and 'attribute'
+            'entity'    => 'company',
+
+            // optional - manually specify the related model and attribute
+            'attribute' => 'nom', // foreign key attribute that is shown to user
+
+            // optional - force the related options to be a custom query, instead of all();
+            'options'   => (function ($query) {
+                return $query->orderBy('created_at', 'DESC')->get();
+            }), //  you can use this to filter the results show in the select
+        ]);
         $this->crud->addField([
             // Select
             'label'     => "Formule",
