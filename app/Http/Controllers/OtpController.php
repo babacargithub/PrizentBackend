@@ -15,7 +15,6 @@ class OtpController extends Controller
 {
 
     public function fetchOtp(Request $request){
-        SMSSender::sendSms(773300853, 1344 . " est votre code de confirmation de Prizent. Valable pour 15 minutes ");
 
         $data = $request->validate([
             'phone_number' => ["required", new PhoneNumber()],

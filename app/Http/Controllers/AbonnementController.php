@@ -8,10 +8,10 @@ use App\Models\Formule;
 use App\Models\Payment;
 use App\Rules\PhoneNumber;
 use App\Services\SMSSender;
-use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -101,7 +101,8 @@ class AbonnementController extends Controller
             $launch_url = $this->getWavePaymentUrl($montant, [
                 "abonnement_id"=>$abonnement->id,
                 "nombre_unites"=>$validated["nombre_unites"],
-                "montant"=>$montant
+                "montant"=>$montant,
+                "phone_number"=>$validated["telephone"]
             ]);
             $message = "Vous avez initié un paiement Wave sur Prizent. Cliquez sur le lien suivant pour valider l'opération $launch_url";
             SMSSender::sendSms($validated["telephone"], $message);
@@ -116,12 +117,17 @@ class AbonnementController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param Request $request
-     * @param PusherBroadcaster $pusherBroadcaster
      * @return JsonResponse
      */
-    public function renouvelerAbonnementCallbackWithWave(Request $request, PusherBroadcaster $pusherBroadcaster): JsonResponse
+    public function renouvelerAbonnementCallbackWithWave(Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true)["data"];
+        $data = json_decode($request->getContent(), true);
+        if (!isset($data["abonnement_id"]) || !isset($data["nombre_unites"])){
+            Log::alert("content of data",["data_logged"=>$data]);
+            Log::alert("abonnement_id or nombres unite not set");
+            Log::alert($request->getContent());
+            return new JsonResponse(["message"=>"something went wrong"], 200);
+        }
         $abonnement = Abonnement::find($data["abonnement_id"]);
         $payment = new Payment();
         $payment->abonnement()->associate($abonnement);
@@ -133,12 +139,15 @@ class AbonnementController extends Controller
         $nombre_unites  = $data["nombre_unites"];
         $unite = $abonnement->formule->unite;
         if ($unite == "mois"){
-            $abonnement->date_expir->addMonths($nombre_unites);
+            $abonnement->date_expir = $abonnement->date_expir->addMonths($nombre_unites);
         }elseif ($unite =="semaine"){
             $abonnement->date_expir = $abonnement->date_expir->addWeeks($nombre_unites);
         }
         $abonnement->save();
-        $pusherBroadcaster->broadcast(["abonnements"],"renewed");
+        $message = "Votre réabonnement à la formule ".$abonnement->formule->nom." a été effectué avec succès. Il est valable jusqu'au ".$abonnement->date_expir->format('d-m-Y H\\h:i:s')."\n Prizent vous remercie ! ";
+        SMSSender::sendSms($data["phone_number"],$message);
+        //TODO broadcast later
+//        $pusherBroadcaster->broadcast(["abonnements"],"renewed");
 
         return response()->json(["message"=>"INITIATED"]);
 
