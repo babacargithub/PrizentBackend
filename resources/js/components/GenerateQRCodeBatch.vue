@@ -1,7 +1,7 @@
 <template>
     <div class="card">
         <div class="card-body row">
-            <div class="card-header"><h4>Générer un lot de Qr Code</h4></div>
+            <div class="card-header"><h4>Créer un lot de Qr Code</h4></div>
             <AlertError v-if="error != null">{{error}}</AlertError>
             <form  @submit.prevent="submitRequest">
                 <div class="form-group col-sm-12 required" element="div" bp-field-wrapper="true" bp-field-name="name"
@@ -14,37 +14,17 @@
                     <input type="submit" value="Valider" class="btn btn-success"/>
                 </div>
             </form>
-<!--
-            <q-card class="q-ma-lg">
-                <div class="col-md-8">
-                    <div class="card">
-                        <q-form @submit.prevent="submitRequest">
-                            <q-input label="Nombre à générer" required v-model.number="quantity"></q-input>
-                            <q-btn type="submit" color="primary">Générer</q-btn>
-                        </q-form>
-                    </div>
-                </div>
-            </q-card>
-
-
--->
-
-
-
-
-
-
 
         </div>
     </div>
 
  <div class="card">
         <div class="card-body row">
-            <h4>Générer un lot d'images de QR Code</h4>
+            <h4>Imprimer un lot d'images de QR Code</h4>
 
-            <div class="card-header">Générer un lot d'images de badges à imprimer</div>
+            <div class="card-header">Imprimer un lot d'images de badges à imprimer</div>
             <AlertError v-if="error != null">{{error}}</AlertError>
-            <form  @submit.prevent="getUnusedBadges(unUsedQuantity)">
+            <form  @submit.prevent="getUnusedQrCodes(unUsedQuantity, type)">
                 <div class="form-group col-sm-12 required" >
                     <label>Nombre à générer</label>
                     <input type="number" name="unUsedQuantity"  class="form-control" v-model.number="unUsedQuantity">
@@ -54,23 +34,11 @@
                 </div>
             </form>
 
-<!--            <q-card class="">
-                <div class="col-md-8">
-                    <div class="card">
-                        <AlertError v-if="error != null">{{error}}</AlertError>
-                        <q-form @submit.prevent="getUnusedBadges(unUsedQuantity)">
-                            <q-input label="Nombre à générer" required v-model.number="unUsedQuantity"></q-input>
-                            <q-btn type="submit" color="primary">Générer images</q-btn>
-                        </q-form>
-                    </div>
-                </div>
-            </q-card>-->
-<!--            <q-btn @click="renderImages">Render images</q-btn>-->
-            <button class="btn btn-danger col-md-2 col-sm-12" @click="save">Zip les images</button>
+            <button class="btn btn-danger col-md-2 col-sm-12" @click="saveImages">Zip les images</button>
 
             <div ref="images" class="q-gutter-lg">
-                <template v-if="badges.length > 0">
-                    <div :key="index" v-for="(badge,index) in badges" :ref="'qr_code_'+index" :id="'qr_code_'+index" class="q-card  row full-width  " style="min-height: 700px; background-image: linear-gradient(
+                <template v-if="qr_codes.length > 0">
+                    <div :key="index" v-for="(badge,index) in qr_codes" :ref="'qr_code_'+index" :id="'qr_code_'+index" class="q-card  row full-width  " style="min-height: 700px; background-image: linear-gradient(
     45deg,
     #04673FFF,
     #039a5c 20px,
@@ -88,7 +56,7 @@
                             <br>
                             <h6 class="text-white" style="display: block; font-weight: bold">QR CODE PRIZENT</h6>
                             <br>
-                            <h2 class="text-white text-center q-mb-lg q-mt-lg" style="display: block; font-size: 120px; font-weight: bolder">{{badge.type == 1 ?"ENTREE": "SORTIE"}}</h2>
+                            <h2 class="text-white text-center q-mb-lg q-mt-lg" style="display: block; font-size: 120px; font-weight: bolder">{{badge.type === 1 ?"ENTRE": "SORTIE"}}</h2>
                         </div>
 
                         <div class="col-10 offset-1 flex flex-center  q-mb-lg " >
@@ -127,11 +95,11 @@ export default {
         return {
             qrCodeUrl: "",
             unUsedQuantity: 0,
-            badge_numbers:[],
+            qr_code_numbers:[],
             error: null,
             quantity: 0,
             type: 0,
-            badges:[],
+            qr_codes:[],
         }
     },
     methods:{
@@ -145,15 +113,21 @@ export default {
                         icon:"success",
                     })
                 }).catch(e => {
-                this.error = e.response.data.message
+                if (e.response) {
+                    this.error = e.response.data.message
+                } else {
+                    Swal.fire({
+                        text:"Une erreur s'est produite inconnu s'est produite",
+                        icon:"error",
+                    })
+                }
             }).finally(() => {
                 Loading.hide()
             })
         },
-        save() {
+        saveImages() {
             let promises = [];
-            for(let i = 0; i < this.badges.length; i++) {
-                let badge_number = this.badges[i].number
+            for(let i = 0; i < this.qr_codes.length; i++) {
                 let element = document.getElementById('qr_code_'+i);
                 const options = {
                     type: "dataURL",
@@ -163,13 +137,12 @@ export default {
 
             }
             Promise.allSettled(promises).then(results=>{
-                console.log("badge_"+(this.badges[0].number??'')+".png")
                 let zip = new JSZip();
-                let img = zip.folder("images");
+                let img = zip.folder("qr_codes_"+(this.type === 1 ? 'entree': "sortie"));
                 for (let i = 0; i < results.length; i++) {
                  let imgData = results[i].value.toDataURL("image/png").replace("data:image/png;base64,", "");
 
-                img.file("badge-"+(i+1)+".png", imgData, {base64: true});
+                img.file("qr_code-"+(i+1)+".png", imgData, {base64: true});
 
                }
 
@@ -183,28 +156,21 @@ export default {
                         saveAs(content, "qr_codes_"+(this.type === 1 ? 'entree': "sortie")+ "_"+currentDateTime+".zip");
                     });
 
-
-               /* html2canvas(element, options).then(canvas => {
-                    // const link = document.createElement("a");
-                    let fileContent = canvas
-                        .toDataURL("image/png").replace("data:image/png;base64,", "")
-                    zipImages(fileContent, "badge_"+badge_number+".png");
-                });*/
             })
 
 
         },
         renderImages(){
             let tempArray = [];
-            for (let i = 0; i < this.badge_numbers.length; i++) {
-                let number = this.badge_numbers[i];
+            for (let i = 0; i < this.qr_code_numbers.length; i++) {
+                let number = this.qr_code_numbers[i];
                 this.renderQrCode(String(number)).then(value=>{
 
                    let badge = {number: number, qr_code: value, type: this.type}
                     tempArray.push(badge)
                 })
             }
-            this.badges = tempArray
+            this.qr_codes = tempArray
         },
         renderQrCode(value){
             return new Promise((resolve,reject)=>{
@@ -217,12 +183,12 @@ export default {
             })
 
         },
-        getUnusedBadges(quantity){
+        getUnusedQrCodes(quantity, type){
 
             this.error = null
-            window.axios.get("unused_qr_codes/"+quantity)
+            window.axios.get("unused_qr_codes/"+quantity+"?type="+type)
                 .then(r => {
-                    this.badge_numbers = r.data
+                    this.qr_code_numbers = r.data
                     this.renderImages();
                 }).catch(e => {
                 console.log(e)

@@ -11,6 +11,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @property integer $commercial_id
+ * @property Commercial $commercial
+ */
 class Company extends Model
 {
     use CrudTrait;
@@ -24,6 +28,13 @@ class Company extends Model
     public function user() : BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+    /**
+     * @noinspection PhpUnused
+     */
+    public function commercial() : BelongsTo
+    {
+        return $this->belongsTo(Commercial::class);
     }
 
     public function abonnement(): HasOne

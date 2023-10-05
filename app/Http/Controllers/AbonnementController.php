@@ -7,6 +7,7 @@ use App\Models\Abonnement;
 use App\Models\Formule;
 use App\Models\Payment;
 use App\Rules\PhoneNumber;
+use App\Services\CommercialCommissionCalculator;
 use App\Services\SMSSender;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -85,11 +86,11 @@ class AbonnementController extends Controller
         $validated = $request->validate([
             "methode_paiement"=>["required",function($value, $attribute, $fail){
 
-            if (strtolower($value) == "om"){
-                $fail("Le paiement par Orange Money n'est pas encore activé. Veuillez utiliser Wave");
-            }else if (strtolower($value) == "cash"){
-                $fail("Le paiement par Cash n'est pas encore autorisé. Veuillez utiliser Wave");
-            }
+                if (strtolower($value) == "om"){
+                    $fail("Le paiement par Orange Money n'est pas encore activé. Veuillez utiliser Wave");
+                }else if (strtolower($value) == "cash"){
+                    $fail("Le paiement par Cash n'est pas encore autorisé. Veuillez utiliser Wave");
+                }
             }],
             "nombre_unites"=>"required|numeric",
             "telephone"=>["required", new PhoneNumber()],
@@ -111,7 +112,7 @@ class AbonnementController extends Controller
             return  response()->json(["message"=>"Paiement par Orange Money pas encore fonctionnel pour le moment. Choisissez Wave"])->setStatusCode(422);
         }
         return  response()->json(["Initiated"=>"OK"]);
-        }
+    }
 
     /**
      * Show the form for editing the specified resource.
@@ -119,7 +120,7 @@ class AbonnementController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function renouvelerAbonnementCallbackWithWave(Request $request): JsonResponse
+    public function renouvelerAbonnementCallbackWithWave(Request $request, CommercialCommissionCalculator $commercialCommissionCalculator): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         if (!isset($data["abonnement_id"]) || !isset($data["nombre_unites"])){
@@ -148,6 +149,10 @@ class AbonnementController extends Controller
         SMSSender::sendSms($data["phone_number"],$message);
         //TODO broadcast later
 //        $pusherBroadcaster->broadcast(["abonnements"],"renewed");
+        $commercial = $abonnement->company->commercial;
+        if ($commercial != null){
+            $commercialCommissionCalculator->calculateCommissions($commercial, $abonnement);
+        }
 
         return response()->json(["message"=>"INITIATED"]);
 

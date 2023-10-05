@@ -24,6 +24,7 @@
                     class="nav-icon la la-plus-circle"></i> <span>Générer QR Codes</span></a></li>
     </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="{{ backpack_url('commercial') }}"><i class="nav-icon la la-handshake"></i> Commerciaux</a></li>
 <li class="nav-item nav-dropdown"><a class="nav-link nav-dropdown-toggle" href="#"><i class="nav-icon la la-cog"></i> Administrations</a>
     <ul class="nav-dropdown-items">
         <li class="nav-item nav-dropdown">
@@ -54,4 +55,3 @@
 
 
 
-<li class="nav-item"><a class="nav-link" href="{{ backpack_url('commercial') }}"><i class="nav-icon la la-question"></i> Commercials</a></li>

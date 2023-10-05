@@ -6,6 +6,7 @@ use Alert;
 use App\Http\Requests\CompanyRequest;
 use App\Http\Requests\StoreCompanyRequest;
 use App\Models\Abonnement;
+use App\Models\Commercial;
 use App\Models\Company;
 use App\Models\Formule;
 use App\Models\Params;
@@ -39,7 +40,7 @@ class CompanyCrudController extends CrudController
      * Configure the CrudPanel object. Apply settings to all operations.
      * @return void
      */
-    public function setup()
+    public function setup(): void
     {
         CRUD::setModel(Company::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/company');
@@ -53,7 +54,7 @@ class CompanyCrudController extends CrudController
      * @return void
      * @noinspection PhpUnused
      */
-    protected function setupListOperation()
+    protected function setupListOperation(): void
     {
         CRUD::column('nom');
         CRUD::column('telephone')->label("Contact");
@@ -75,7 +76,7 @@ class CompanyCrudController extends CrudController
      * @see https://backpackforlaravel.com/docs/crud-operation-create
      * @return void
      */
-    protected function setupCreateOperation()
+    protected function setupCreateOperation(): void
     {
         CRUD::setValidation(CompanyRequest::class);
         CRUD::field('nom');
@@ -100,7 +101,7 @@ class CompanyCrudController extends CrudController
      * @return void
      * @noinspection PhpUnused
      */
-    protected function setupUpdateOperation()
+    protected function setupUpdateOperation(): void
     {
         $this->setupCreateOperation();
     }
@@ -108,6 +109,7 @@ class CompanyCrudController extends CrudController
     public function store(StoreCompanyRequest $request)
     {
         $company = new Company($this->crud->getStrippedSaveRequest($request));
+        // Create user account
         $userAccount = new User();
         $userAccount->email = $company->email;
         $userAccount->name = $company->nom;
@@ -118,7 +120,8 @@ class CompanyCrudController extends CrudController
         $userAccount->telephone = $company->telephone;
         $company->user()->associate($userAccount);
         $company->save();
-        $abonnement = new Abonnement(["date_expir" => Carbon::now()->addDays(2)->toDateTimeString()]);
+        // TODO decide what to do with the default length of trial period and whether it should be enabled
+        $abonnement = new Abonnement(["date_expir" => Carbon::now()->addDays(3)->toDateTimeString()]);
         $abonnement->formule()->associate(Formule::first());
         $abonnement->company()->associate($company);
         $abonnement->save();
@@ -129,7 +132,12 @@ class CompanyCrudController extends CrudController
         foreach ($params as $param) {
             $company->params()->save($param);
         }
-        //TODO create entry data for the the salesperson who created it
+        // create entry data for  the salesperson who created it
+        $commercial = Commercial::whereUserId(backpack_user()->id)->first();
+        if ($commercial != null){
+            $company->commercial()->associate($commercial);
+            $company->save();
+        }
 
         // show a success message
         Alert::success(trans('backpack::crud.insert_success'))->flash();

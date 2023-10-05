@@ -83,7 +83,7 @@ Route::post('/request_password_reset', function (Request $request){
             "phone_number" => $user->telephone,
             ]);
         $otp = $codeOtp->otp;
-        $content = "$otp est le code de réinitialisation de votre compte Prizent.";
+        $content = "$otp est le code de réinitialisation de votre compte Prizent. Valable jusqu'au ".$codeOtp->expires_at->format('H:i:s');
         if ($user->telephone != null){
             SMSSender::sendSms($user->telephone,$content);
         }else{

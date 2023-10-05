@@ -28,6 +28,7 @@ class StoreCompanyRequest extends FormRequest
     {
         return [
             "telephone"=>["unique:companies", new PhoneNumber()],
+            "nom"=>"unique:companies",
             "email"=>"email|unique:companies"
             //
         ];

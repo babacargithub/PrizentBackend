@@ -38,6 +38,7 @@ class MobileAppController extends Controller
      * @return QrCode|JsonResponse
      */
     public function getQrCode($qrCodeNumber)
+
     {
         $qrCode = QrCode::whereNumber($qrCodeNumber)->first();
         if ($qrCode == null){

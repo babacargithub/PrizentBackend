@@ -6,12 +6,14 @@ use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property integer $telephone
  * @property User $user
  * @property string $email
  * @property string $sexe
+ * @property Company[] $companies
  */
 class Commercial extends Model
 {
@@ -24,6 +26,12 @@ class Commercial extends Model
     public function user() : BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function companies(): HasMany
+    {
+        return $this->hasMany(Company::class);
+
     }
 
 }
