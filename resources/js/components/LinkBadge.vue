@@ -1,9 +1,9 @@
 <template>
-        <q-card class="">
+        <q-card>
             <div class="col-md-8">
                 <div class="card">
-                    <div class="card-header">Attribuer un Badge</div>
                     <AlertError v-if="error != null">{{error}}</AlertError>
+                    <div class="card-header">Attribuer un Badge</div>
                     <q-form @submit.prevent="submit">
                         <q-input label="Numéro Badge" v-model="data.badge_number"></q-input>
                         <q-input label="Téléphone Employé" v-model="data.employe_telephone"></q-input>
@@ -46,7 +46,11 @@
                         })
 
                     }).catch(e => {
-                    this.error = e.response.data.message
+                        if (e.status === 422) {
+                            if (e.data) {
+                                this.error = e.data.message
+                            }
+                        }
                 }).finally(() => {
                     Loading.hide()
                 })
