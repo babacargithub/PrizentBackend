@@ -12,6 +12,7 @@ class Journee extends Model
     public $timestamps = false;
     protected $fillable = ["calendrier","name","ferie"];
     protected $dates = ["calendrier"];
+    protected $casts =["ferie"=>"bool"];
 
     public static function today(): Journee
     {

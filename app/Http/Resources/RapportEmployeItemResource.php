@@ -28,7 +28,7 @@ class RapportEmployeItemResource extends JsonResource
         return [
             "journee"=> $this->journee->calendrier->format('d-m-Y'),
             "scanned_at"=>Carbon::createFromFormat('H:i:s',$this->scanned_at)->format('H:i'),
-            "ponctualite"=>$this->ponctualite
+            "ponctualite"=>$this->ponctualite,
             ];
     }
 }

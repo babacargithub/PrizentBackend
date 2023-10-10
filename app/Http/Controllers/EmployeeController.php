@@ -14,6 +14,7 @@ use App\Models\Formule;
 use App\Models\HoraireEmploye;
 use App\Models\Journee;
 use App\Models\Sortie;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -61,12 +62,12 @@ class EmployeeController extends Controller
         }
 
         $ponctualiteRankings = collect($ponctualiteRankings)->sortByDesc("ponctualite")->values()->map(function (array $item, int $key) {
-             $item["position"]= $key+1;
-             return $item;
+            $item["position"]= $key+1;
+            return $item;
         });
         $supplementRankings = collect($supplementRankings)->sortByDesc("ponctualite")->values()->map(function (array $item, int $key) {
-             $item["position"]= $key+1;
-             return $item;
+            $item["position"]= $key+1;
+            return $item;
         });
 
 
@@ -78,56 +79,99 @@ class EmployeeController extends Controller
      *
      * @return Employe[]|JsonResponse
      */
-    public function rapport(Employe $employe, $dateStart, $dateEnd)
+    public function rapport(Employe $employe, $dateStart, $dateEnd): JsonResponse|array
     {
+
         if (! $this->belongsToCompany($employe)){
 
             return  $this->forbiddenResponse();
         }
-        $entreeQuery = Entree::where("employe_id", $employe->id);
-        $entrees = $entreeQuery
-            ->whereRelation("employe","company_id","=",Company::requireLoggedInCompany()->id)
-            ->whereHas("journee",function (Builder $query) use ($dateStart, $dateEnd){
-                $query->whereBetween("calendrier", [$dateStart, $dateEnd]); }
-            )->get();
-        $sortieQuery = Sortie::where("employe_id", $employe->id);
-        $sorties = $sortieQuery
-            ->whereRelation("employe","company_id","=",Company::requireLoggedInCompany()->id)
-            ->whereHas("journee",function (Builder $query) use ($dateStart, $dateEnd){
-                $query->whereBetween("calendrier", [$dateStart, $dateEnd]); }
-            )->get();
+        $journeesDuMois = Journee::whereBetween("calendrier", [$dateStart, $dateEnd])
+            ->where('calendrier',"<=", Carbon::now()->toDateString())
+            ->orderBy('calendrier',"asc")
+            ->get();
+        $entrees = [];
+        $sorties = [];
+        $joursAbsentes =  0;
 
-        $totalRetards = $entreeQuery->whereRelation("employe","company_id","=",Company::requireLoggedInCompany()->id)
+        $entreeQuery = Entree::where("employe_id", $employe->id);
+        $sortieQuery = Sortie::where("employe_id", $employe->id);
+
+        foreach ($journeesDuMois as $journee) {
+
+
+            $entree = Entree::where("employe_id", $employe->id)->with('journee')
+                ->whereRelation("employe","company_id","=",Company::requireLoggedInCompany()->id)
+                ->where('journee_id',$journee->id)->first();
+            if ($entree != null) {
+                $entrees[] = new RapportEmployeItemResource($entree);
+            }else{
+                $item =  ["journee"=>$journee->calendrier->format('d-m-Y'),"scanned_at"=> null,"ponctualite"=>0 ];
+                $repos = $employe->isJourneeRepos($journee);
+                if ($repos){
+                    $item["repos"] = true;
+                    $item["absent"] = false;
+                }elseif ($journee->ferie){
+                    $item["ferie"] = true;
+                    $item["absent"] = false;
+                }
+                else{
+                    $item["absent"] = true;
+
+                }
+                $entrees[] = $item;
+            }
+            $sortie = Sortie::where("employe_id", $employe->id)
+                ->whereRelation("employe","company_id","=",Company::requireLoggedInCompany()->id)
+                ->where('journee_id',$journee->id)->first();
+            if ($sortie != null) {
+                $sorties[] = new RapportEmployeItemResource($sortie);
+            }else{
+                $item =  ["journee"=>$journee->calendrier->format('d-m-Y'),"scanned_at"=> null,"ponctualite"=>0 ];
+                $repos = $employe->isJourneeRepos($journee);
+                if ($repos){
+                    $item["repos"] = true;
+                    $item["absent"] = false;
+                }elseif ($journee->ferie){
+                    $item["ferie"] = true;
+                    $item["absent"] = false;
+                }
+                else{
+                    $item["absent"] = true;
+
+                }
+                $sorties[] = $item;
+            }
+
+
+                $entree = Entree::where("employe_id", $employe->id)
+                    ->where("journee_id",intval($journee->id))->first();
+                if ($entree == null){
+                    $joursAbsentes++;
+                }
+
+        }
+        $totalRetards = Entree::where("employe_id", $employe->id)->whereRelation("employe","company_id","=",Company::requireLoggedInCompany()->id)
             ->whereHas("journee",function (Builder $query) use ($dateStart, $dateEnd){
                 $query->whereBetween("calendrier", [$dateStart, $dateEnd]); }
             )->where("ponctualite",'<',0)
             ->sum("ponctualite");
-        $totalSupplement = $sortieQuery->whereRelation("employe","company_id","=",Company::requireLoggedInCompany()->id)
+        $totalSupplement = Sortie::where("employe_id", $employe->id)->whereRelation("employe","company_id","=",Company::requireLoggedInCompany()->id)
             ->whereHas("journee",function (Builder $query) use ($dateStart, $dateEnd){
                 $query->whereBetween("calendrier", [$dateStart, $dateEnd]); }
             )->where("ponctualite",'>=',0)
             ->sum("ponctualite");
-        $journeesIds = Journee::select('id')
-            ->whereBetween("calendrier",[$dateStart,$dateEnd])
-            ->whereFerie(false)
-            ->whereDate('calendrier',">=", $employe->created_at->toDateString())
-            ->get()->toArray();
-        $joursAbsentes =  0;
-        foreach ($journeesIds as $journeesId) {
-            $entree = Entree::where("employe_id", $employe->id)
-                ->where("journee_id",intval($journeesId["id"]))->first();
-            if ($entree == null){
-                $joursAbsentes = $joursAbsentes + 1;
-            }
-        }
+
         return [
+            "mois"=>Carbon::create($dateStart)->format('F Y'),
             "employe"=>new EmployeResource($employe),
             "periode"=>'du '.$dateStart.' au '.$dateEnd,
-            "entrees"=>RapportEmployeItemResource::collection($entrees),
-            "sorties"=>RapportEmployeItemResource::collection($sorties),
+            "entrees"=>$entrees,
+            "sorties"=>$sorties,
             "retard"=> intval($totalRetards),
             "absence"=>$joursAbsentes,
-            "supplement"=>intval($totalSupplement)];
+            "supplement"=>intval($totalSupplement)
+        ];
 
     }
 
@@ -203,10 +247,10 @@ class EmployeeController extends Controller
      */
     public function destroy(Employe $employe)
     {
-       if (! $this->belongsToCompany($employe)){
+        if (! $this->belongsToCompany($employe)){
 
-           return  $this->forbiddenResponse();
-       }
+            return  $this->forbiddenResponse();
+        }
         $employe->delete();
         return  new Response('deleted');
     }
@@ -218,7 +262,7 @@ class EmployeeController extends Controller
     protected function belongsToCompany(Employe $employe): bool
     {
         return Company::requireLoggedInCompany()
-            ->employes()->whereId($employe->id)->first() !== null;
+                ->employes()->whereId($employe->id)->first() !== null;
 
     }
 

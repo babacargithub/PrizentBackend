@@ -52,6 +52,18 @@ class Employe extends Model
         return $this->hasMany(HoraireEmploye::class);
 
     }
+    public function isJourneeRepos(Journee $journee) : bool{
+        $dayNumber = $journee->calendrier->dayOfWeekIso;
+        $jour = $this->horaires()->where('jour',$dayNumber)->first();
+        if ($jour instanceof HoraireEmploye){
+            return $jour->repos;
+        }
+        return false;
+
+    }
+    public function isJourneeConge(Journee $journee){
+
+    }
 
     public function isBadgeAllowed(): bool
     {
