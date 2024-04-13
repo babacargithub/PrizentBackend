@@ -148,6 +148,7 @@ Route::prefix("mobile/")
 Route::middleware(["auth:sanctum", CheckIfHasActiveSubscription::class])->group(function() {
     Route::get("pointages/{date}",[JourneeController::class,"pointages"]);
     Route::get('employes/{employe}/rapport/{dateStart}/{dateEnd}', [EmployeeController::class,"rapport"]);
+    Route::get('employes/rapport_mensuel/mois/{mois}/annee/{annee}', [EmployeeController::class,"rapportMensuel"]);
     Route::get('employes/rankings/{dateStart}/{dateEnd}', [EmployeeController::class,"rankings"]);
     Route::post("badges/link",[BadgeController::class,"linkBadgeWithEmploye"])->name('badges.link');
     Route::get('companies/pointeurs', [CompanyController::class,"pointeurs"]);

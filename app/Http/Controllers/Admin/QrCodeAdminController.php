@@ -15,7 +15,6 @@ class QrCodeAdminController extends CrudController
     //
     public function index()
     {
-        SMSSender::sendSms(773300853,"test");
         return view('admin.qr_codes',[
             "unUsedCount" => QrCode::whereNull("company_id")->count()
         ]);
@@ -64,7 +63,7 @@ class QrCodeAdminController extends CrudController
     {
         if ($request->isMethod("POST")) {
             $validated = $request->validate(["quantity"=>"required|integer|min:1|max:10",
-                "type"=>["required","integer", Rule::in([1,2])]]);
+                "type"=>["required","string", Rule::in(['in','out'])]]);
             $qrCodes = [];
             $biggest = QrCode::max("number");
             $batchStart = $biggest > 0 ? $biggest : 21111;
@@ -73,10 +72,10 @@ class QrCodeAdminController extends CrudController
                 $batchStart++;
                 $qrCode = [
                     "number" => $batchStart,
-                    "nom"=>"Inconnu",
+                    "nom"=>"Nom par défaut",
                     "type"=>$validated["type"],
                     "latitude"=>14.1247678,
-                    "maximum_distance"=>500,
+                    "maximum_distance"=>100,
                     "longitude"=>14.124344];
                 $qrCodes[] = $qrCode;
             }
@@ -92,7 +91,11 @@ class QrCodeAdminController extends CrudController
     /** @noinspection UnknownColumnInspection */
     public function getUnusedQrCodes($quantity)
     {
-        return QrCode::whereNull("company_id")->limit($quantity)->pluck("number");
+        $results = QrCode::whereNull("company_id")->limit($quantity)->pluck("number");
+        if ($results->isEmpty()){
+            return response("No items found")->setStatusCode(404);
+        }
+        return $results;
 
     }
 }

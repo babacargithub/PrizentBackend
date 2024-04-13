@@ -1,19 +1,26 @@
 <template>
+    <div class="q-ma-lg">
         <q-card class="">
 
-            <q-card-section>
-                <AlertError  v-if="error != null" >{{error}}</AlertError>
-                <p class="bg-white text-red" ><q-icon color="red" name="mdi-alert-circle"></q-icon></p>
-                <q-form @submit.prevent="submitRequest">
-                    <q-input  required label="Société" v-model="data.company_telephone"></q-input>
-                    <q-input required label="Numéro Qr code" v-model="data.qr_code_number"></q-input>
-                    <q-input required label="Nom du QR code" v-model="data.nom"></q-input>
-                    <q-input required label="Latitude" v-model="data.latitude"></q-input>
-                    <q-input required label="Longitude" v-model="data.longitude"></q-input>
-                    <q-btn color="primary" type="submit">Valider</q-btn>
-                </q-form>
-            </q-card-section>
+            <div class="q-ma-lg">
+                <q-card-section>
+                    <AlertError v-if="error != null">{{ error }}</AlertError>
+                    <p class="bg-white text-red">
+                        <q-icon color="red" name="mdi-alert-circle"></q-icon>
+                    </p>
+                    <q-form @submit.prevent="submitRequest">
+                        <q-input required label="Téléphone Société" v-model="data.company_telephone"
+                                 hint="Numéro téléphone de la société à attribuer le qr code"></q-input>
+                        <q-input required label="Numéro Qr code" v-model="data.qr_code_number"></q-input>
+                        <q-input required label="Nom du QR code" v-model="data.nom"></q-input>
+                        <q-input required label="Latitude" v-model="data.latitude"></q-input>
+                        <q-input required label="Longitude" v-model="data.longitude"></q-input>
+                        <q-btn color="primary" type="submit">Valider</q-btn>
+                    </q-form>
+                </q-card-section>
+            </div>
         </q-card>
+    </div>
 </template>
 
 <script>

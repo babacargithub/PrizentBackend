@@ -2,13 +2,19 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Employe;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use JsonSerializable as JsonSerializableAlias;
 
-class EntreeResource extends JsonResource
+/**
+ * @property Employe $employe
+ * @property integer $ponctualite
+ * @property Carbon $scanned_at
+ */
+class PointageResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -20,7 +26,7 @@ class EntreeResource extends JsonResource
     {
         return [
             "employe"=>$this->employe,
-            "scanned_at"=>Carbon::createFromFormat('H:i:s',$this->scanned_at)->format("H:i"),
+            "scanned_at"=>Carbon::createFromFormat("H:i:s", $this->scanned_at)->format('H:i'),
             "ponctualite"=>$this->ponctualite
             ];
     }

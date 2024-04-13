@@ -52,8 +52,7 @@ class FormuleCrudController extends CrudController
         CRUD::column('prix');
         CRUD::column('duree');
         CRUD::column('unite');
-        CRUD::column('created_at');
-        CRUD::column('updated_at');
+
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:
@@ -78,6 +77,16 @@ class FormuleCrudController extends CrudController
         CRUD::field('prix');
         CRUD::field('duree');
         CRUD::field('unite');
+        $this->crud->addField([
+            'name' => 'features',
+            'label' => "Fonctionnalités",
+            'type' => 'select',
+            'entity' => 'features',
+            'attribute' => 'nom',
+            'multiple' => true,
+            'model' => "App\Models\Feature",
+            'pivot' => false,
+        ]);
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:

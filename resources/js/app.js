@@ -76,6 +76,16 @@ app.mixin({
                 }
             })
         },
+        showAlertError(message, onClose){
+            Swal.fire({
+                icon: "error",
+                text: message
+            }).then(value=>{
+                if (typeof onClose === "function"){
+                    onClose()
+                }
+            })
+        },
         showLoading(){
             Loading.show({
                 message: "Chargement",

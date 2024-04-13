@@ -47,7 +47,6 @@ class SMSSender
         $sms->message($content)
             ->from($clientSenderPhoneNumber, $clientSenderName)
             ->to($phoneNumber);
-        dd($sms->send());
         return self::hasRequestSucceeded($sms->send());
     }
 

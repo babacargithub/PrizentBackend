@@ -8,9 +8,10 @@
                      bp-field-type="text">
                     <label>Nombre à générer</label>
                     <input type="text" name="quantity"  class="form-control" v-model.number="quantity">
-                    <label>Type de QR code à générer</label>
-
-                    <input type="text" name="type"  class="form-control" v-model.number="type">
+                    <label>Type de QR code à générer</label><br>
+                    <input type="radio" v-model="type" value="in" />  <label for="age1">Entrée</label><br>
+                    <input type="radio" v-model="type" value="out" />  <label for="age1">Sortie
+                </label><br>
                     <input type="submit" value="Valider" class="btn btn-success"/>
                 </div>
             </form>
@@ -24,12 +25,14 @@
 
             <div class="card-header">Imprimer un lot d'images de badges à imprimer</div>
             <AlertError v-if="error != null">{{error}}</AlertError>
-            <form  @submit.prevent="getUnusedQrCodes(unUsedQuantity, type)">
+            <form  @submit.prevent="getUnusedQrCodes(unUsedQuantity, type_generate)">
                 <div class="form-group col-sm-12 required" >
                     <label>Nombre à générer</label>
                     <input type="number" name="unUsedQuantity"  class="form-control" v-model.number="unUsedQuantity">
-                    <label>Type de QR Code</label>
-                    <input type="number" name="type"  class="form-control" v-model.number="type">
+                    <label>Type de QR Code</label><br>
+                    <input type="radio" v-model="type_generate" value="in" />  <label for="age1">Entrée</label><br>
+                    <input type="radio" v-model="type_generate" value="out" />  <label for="age1">Sortie
+                </label><br>
                     <input type="submit" value="Valider" class="btn btn-success"/>
                 </div>
             </form>
@@ -56,7 +59,8 @@
                             <br>
                             <h6 class="text-white" style="display: block; font-weight: bold">QR CODE PRIZENT</h6>
                             <br>
-                            <h2 class="text-white text-center q-mb-lg q-mt-lg" style="display: block; font-size: 120px; font-weight: bolder">{{badge.type === 1 ?"ENTRE": "SORTIE"}}</h2>
+                            <h2 class="text-white text-center q-mb-lg q-mt-lg" style="display: block; font-size:
+                            120px; font-weight: bolder">{{badge.type === 'in' ?"ENTRÉE": "SORTIE"}}</h2>
                         </div>
 
                         <div class="col-6 offset-3 flex flex-center  q-mb-lg " >
@@ -89,7 +93,6 @@ export default {
     name: "GenerateBadge",
     components: {AlertError},
     mounted() {
-        console.log('Qr code generate Component mounted.')
     },
     data() {
         return {
@@ -98,7 +101,8 @@ export default {
             qr_code_numbers:[],
             error: null,
             quantity: 0,
-            type: 0,
+            type: null,
+            type_generate: null,
             qr_codes:[],
         }
     },
@@ -108,13 +112,13 @@ export default {
             this.error = null
             window.axios.post("generate", {quantity:this.quantity, type: this.type})
                 .then(r => {
-                    Swal.fire({
-                        text:"Généré avec succès !",
-                        icon:"success",
-                    })
+                   this.showAlertSuccess('Généré avec succès !')
                 }).catch(e => {
-                if (e.response) {
-                    this.error = e.response.data.message
+                if (e.data) {
+                    if (e.status===422) {
+                        this.showAlertError(e.data.message)
+                    } else {
+                    }
                 } else {
                     Swal.fire({
                         text:"Une erreur s'est produite inconnu s'est produite",

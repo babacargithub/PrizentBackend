@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\EntreeResource;
-use App\Http\Resources\SortieResource;
+use App\Http\Resources\PointageResource;
 use App\Models\Company;
-use App\Models\Entree;
 use App\Models\Journee;
-use App\Models\Sortie;
+use App\Models\Pointage;
 use Carbon\Carbon;
 
 class JourneeController extends Controller
@@ -23,13 +21,21 @@ class JourneeController extends Controller
         $date = Carbon::create($date);
         $journee = Journee::where("calendrier",$date->toDateString())->first();
         if ($journee != null) {
-            $entrees = EntreeResource::collection(Entree::where("journee_id", $journee->id)->whereRelation("employe", "company_id", "=", Company::requireLoggedInCompany()->id)->orderBy('scanned_at')->get());
-            $sorties = SortieResource::collection(Sortie::where("journee_id", $journee->id)->whereRelation("employe", "company_id", "=", Company::requireLoggedInCompany()->id)->orderBy('scanned_at')->get());
+            $sortieQuery = Pointage::where("journee_id", $journee->id)
+                ->whereHas("employe", function ($query) {
+                    $query->where("company_id", Company::requireLoggedInCompany()->id);
+                })
+                ->orderBy('scanned_at');
+            $entreeQuery = clone  $sortieQuery;
+
+            $sorties = PointageResource::collection($sortieQuery->sortie()->get());
+               $entrees = PointageResource::collection($entreeQuery->entree()->get());
             return ["journee" => $journee, "sorties" => $sorties, "entrees" => $entrees];
         }
         return [];
     }
 
+    /** @noinspection PhpUnused */
     public static function createJourneesDuMois()
     {
 

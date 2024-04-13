@@ -8,12 +8,11 @@ use App\Http\Resources\EmployeResource;
 use App\Http\Resources\RapportEmployeItemResource;
 use App\Models\Company;
 use App\Models\Employe;
-use App\Models\Entree;
 use App\Models\Feature;
 use App\Models\Formule;
 use App\Models\HoraireEmploye;
 use App\Models\Journee;
-use App\Models\Sortie;
+use App\Models\Pointage;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -49,11 +48,11 @@ class EmployeeController extends Controller
         $supplementRankings = [];
         $ponctualiteRankings = [];
         foreach ($employes as $employe) {
-            $ponctualite = Entree::whereEmployeId($employe->id)
+            $ponctualite = Pointage::whereEmployeId($employe->id)
                 ->whereHas("journee",function (Builder $query) use ($dateStart, $dateEnd){
                     $query->whereBetween("calendrier", [$dateStart, $dateEnd]); }
                 )->sum("ponctualite");
-            $supplement = Sortie::whereEmployeId($employe->id)
+            $supplement = Pointage::whereEmployeId($employe->id)
                 ->whereHas("journee",function (Builder $query) use ($dateStart, $dateEnd){
                     $query->whereBetween("calendrier", [$dateStart, $dateEnd]); }
                 )->sum("ponctualite");
@@ -88,20 +87,16 @@ class EmployeeController extends Controller
         }
         $journeesDuMois = Journee::whereBetween("calendrier", [$dateStart, $dateEnd])
             ->where('calendrier',"<=", Carbon::now()->toDateString())
-            ->orderBy('calendrier',"asc")
+            ->orderBy('calendrier')
             ->get();
         $entrees = [];
         $sorties = [];
         $joursAbsentes =  0;
 
-        $entreeQuery = Entree::where("employe_id", $employe->id);
-        $sortieQuery = Sortie::where("employe_id", $employe->id);
-
         foreach ($journeesDuMois as $journee) {
 
-
-            $entree = Entree::where("employe_id", $employe->id)->with('journee')
-                ->whereRelation("employe","company_id","=",Company::requireLoggedInCompany()->id)
+            $entree = Pointage::entree()
+                ->where("employe_id", $employe->id)
                 ->where('journee_id',$journee->id)->first();
             if ($entree != null) {
                 $entrees[] = new RapportEmployeItemResource($entree);
@@ -121,8 +116,8 @@ class EmployeeController extends Controller
                 }
                 $entrees[] = $item;
             }
-            $sortie = Sortie::where("employe_id", $employe->id)
-                ->whereRelation("employe","company_id","=",Company::requireLoggedInCompany()->id)
+            $sortie = Pointage::sortie()
+                ->where("employe_id", $employe->id)
                 ->where('journee_id',$journee->id)->first();
             if ($sortie != null) {
                 $sorties[] = new RapportEmployeItemResource($sortie);
@@ -144,19 +139,25 @@ class EmployeeController extends Controller
             }
 
 
-                $entree = Entree::where("employe_id", $employe->id)
+                $entree = Pointage::entree()->where("employe_id", $employe->id)
                     ->where("journee_id",intval($journee->id))->first();
                 if ($entree == null){
                     $joursAbsentes++;
                 }
 
         }
-        $totalRetards = Entree::where("employe_id", $employe->id)->whereRelation("employe","company_id","=",Company::requireLoggedInCompany()->id)
+        // TODO: implement this method
+        $heuresEntreesAnticipees = 0;
+        $heuresSortiesAnticipees = 0;
+        $totalRetards = Pointage::entree()->where("employe_id", $employe->id)
             ->whereHas("journee",function (Builder $query) use ($dateStart, $dateEnd){
                 $query->whereBetween("calendrier", [$dateStart, $dateEnd]); }
             )->where("ponctualite",'<',0)
             ->sum("ponctualite");
-        $totalSupplement = Sortie::where("employe_id", $employe->id)->whereRelation("employe","company_id","=",Company::requireLoggedInCompany()->id)
+        $totalSupplement = Pointage::sortie()
+            ->where("employe_id", $employe->id)->whereRelation("employe",
+                "company_id","=",
+            Company::requireLoggedInCompany()->id)
             ->whereHas("journee",function (Builder $query) use ($dateStart, $dateEnd){
                 $query->whereBetween("calendrier", [$dateStart, $dateEnd]); }
             )->where("ponctualite",'>=',0)
@@ -238,6 +239,27 @@ class EmployeeController extends Controller
 
         return  $employe;
 
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function rapportMensuel()
+    {
+        //TODO: implement this method
+        $data["periode"] = "Septembre 2024";
+        $data["rapports"] = [];
+        $employes = Company::requireLoggedInCompany()->employes()->whereActif(true)->get();
+        foreach ($employes as /** @var Employe $employe */$employe) {
+            $data["rapports"][]= [
+                "ranking"=>$employe->full_name,
+                "full_name"=>fake('fr'),
+                "retards"=>random_int(100,999),
+                "supplement"=>random_int(100,999),
+                "absences"=>random_int(100,999),
+            ];
+        }
+        return $data;
     }
     /**
      * Remove the specified resource from storage.

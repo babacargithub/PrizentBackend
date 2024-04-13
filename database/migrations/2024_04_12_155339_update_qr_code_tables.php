@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -12,11 +13,10 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('sorties', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-            $table->time('scanned_at');
-            $table->integer('ponctualite');
+        //
+        Schema::table('qr_codes', function (Blueprint $table) {
+            $table->string("type",5)->change();
+
         });
     }
 
@@ -27,6 +27,10 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('sorties');
+        //
+        Schema::table('qr_codes', function (Blueprint $table) {
+            $table->integer("type")->change();
+
+        });
     }
 };

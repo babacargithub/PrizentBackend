@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\PhoneNumber;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CommercialRequest extends FormRequest
@@ -26,12 +27,12 @@ class CommercialRequest extends FormRequest
     {
         return [
              'nom' => 'required|min:5|max:255',
-             'email' => 'unique:commercials',
-             'telephone' => 'required|unique:commercials'
+             'email' => 'email|unique:commercials,email,'.$this->email,
+             'telephone' => [new PhoneNumber(),'required','unique:commercials,telephone,'.$this->telephone]
         ];
     }
 
-    /**
+    /**rr
      * Get the validation attributes that apply to the request.
      *
      * @return array

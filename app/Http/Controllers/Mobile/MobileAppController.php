@@ -4,15 +4,12 @@ namespace App\Http\Controllers\Mobile;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePointageRequest;
-use App\Http\Resources\Mobile\EntreeMobileResource;
+use App\Http\Resources\Mobile\PointageMobileResource;
 use App\Models\Badge;
-use App\Models\Company;
 use App\Models\Employe;
-use App\Models\Entree;
 use App\Models\Journee;
+use App\Models\Pointage;
 use App\Models\QrCode;
-use App\Models\Sortie;
-use App\Rules\Mobile\CompanyHasActiveSubscription;
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
@@ -57,19 +54,18 @@ class MobileAppController extends Controller
         $dateStart = Carbon::now()->startOfMonth();
         $dateEnd = Carbon::now()->endOfMonth();
         $employe = Employe::requiredLoggedInEmploye();
-        $entrees = EntreeMobileResource::collection(
-            Entree::where("employe_id",$employe->id )
-                ->whereRelation("journee","calendrier",">=", $dateStart->toDateString())
-                ->whereRelation("journee","calendrier","<=", $dateEnd->toDateString())
-//                    ->join('journees', 'journee.id', '=', 'entrees.journee_id')
-
-                ->orderBy('id',"desc")->get());
-        $sorties = EntreeMobileResource::collection(
-            Sortie::where("employe_id",$employe->id )
-                ->whereRelation("journee","calendrier",">=", $dateStart->toDateString())
-                ->whereRelation("journee","calendrier","<=", $dateEnd->toDateString())
-
-                ->orderBy('id',"desc")->get());
+        $query = Pointage::where("employe_id",$employe->id )
+            ->whereRelation("journee","calendrier",">=", $dateStart->toDateString())
+            ->whereRelation("journee","calendrier","<=", $dateEnd->toDateString())
+            ->orderBy('id',"desc");
+        $entrees = PointageMobileResource::collection(
+            $query
+                ->whereType(Pointage::POINTAGE_SORTIE)
+                ->get());
+        $sorties = PointageMobileResource::collection(
+            $query
+                ->whereType(Pointage::POINTAGE_SORTIE)
+                ->get());
 
         return [ "sorties" => $sorties, "entrees" => $entrees];
 
@@ -83,9 +79,11 @@ class MobileAppController extends Controller
     {
         $qrCode = QrCode::find($request->input("qr_code_id"));
         if ($qrCode->type == QrCode::TYPE_ENTREE){
-            $pointage = new Entree($request->validated());
+            $pointage = new Pointage($request->validated());
+            $pointage->type = Pointage::POINTAGE_ENTREE;
         }else if ($qrCode->type == QrCode::TYPE_SORTIE){
-            $pointage = new Sortie($request->validated());
+            $pointage = new Pointage($request->validated());
+            $pointage->type = Pointage::POINTAGE_SORTIE;
 
         }else{
             throw new InvalidArgumentException("Type de qr code inconnu ");
@@ -107,16 +105,18 @@ class MobileAppController extends Controller
     {
          $validated = $request->validate([
             "badge_physique"=>"required|boolean",
+             "type"=>["required","integer",
+                 Rule::in([1, 2]),
             "employe_id"=>[
                 "required",
                 "integer",
-                Rule::unique($request->get("type",0) == QrCode::TYPE_ENTREE? 'entrees': "sorties")->where(function (Builder $query) use ($request) {
+                Rule::unique('pointages')->where(function (Builder $query) use ($request) {
                     $query->where('employe_id', $request->get("employe_id",0));
                     $query->where("journee_id", Journee::today()->id);
+                    $query->where("type", $request->get("type",0) == QrCode::TYPE_ENTREE? Pointage::POINTAGE_ENTREE: Pointage::POINTAGE_SORTIE);
                 })
             ],
-            "type"=>["required","integer",
-                Rule::in([1, 2]),
+
 
             ],"pointeur_id"=>["required","integer",
                 function (string $attribute, mixed $value, Closure $fail) use ($request) {
@@ -126,7 +126,7 @@ class MobileAppController extends Controller
 
                     }
                     if (! $pointeur->company->hasActiveSubscription()){
-                        $fail("Le compte Prizent de votre société n'est pas actif. Abonnement expiré.");
+                        $fail("Le compte ".$pointeur->company->nom." n'est pas actif. Signalez aux admins.");
 
                     }
 
@@ -169,9 +169,11 @@ class MobileAppController extends Controller
 
 
         if ($type == QrCode::TYPE_ENTREE){
-            $pointage = new Entree($request->input());
+            $pointage = new Pointage($request->input());
+            $pointage->type = Pointage::POINTAGE_ENTREE;
         }else if ($type == QrCode::TYPE_SORTIE){
-            $pointage = new Sortie($request->input());
+            $pointage = new Pointage($request->input());
+            $pointage->type = Pointage::POINTAGE_SORTIE;
 
         }else{
             throw new InvalidArgumentException("Type de qr code inconnu ");

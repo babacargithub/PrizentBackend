@@ -18,6 +18,6 @@ class Formule extends Model
 
     public function hasFeature($feature) : bool
     {
-        return  $this->features()->whereConstantName($feature)->first() != null;
+        return  $this->features()->whereConstantName($feature)->exists();
     }
 }

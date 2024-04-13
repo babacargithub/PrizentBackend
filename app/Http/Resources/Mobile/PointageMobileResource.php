@@ -14,7 +14,7 @@ use JsonSerializable as JsonSerializableAlias;
  * @property integer $ponctualite
  * @property Carbon $scanned_at
  */
-class EntreeMobileResource extends JsonResource
+class PointageMobileResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
