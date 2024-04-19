@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Feature extends Model
 {
+    protected $fillable = ['public_name', 'constant_name', 'disabled'];
     use HasFactory;
     const FEATURE_PHYSICAL_BADGE = "physical_badge";
     const FEATURE_LOCATION_CONSTRAINT = "location_constraint";
@@ -21,5 +22,8 @@ class Feature extends Model
 
     public function formules() : BelongsToMany {
         return  $this->belongsToMany(Formule::class);
+    }
+    public function __toString() : string {
+        return $this->public_name;
     }
 }

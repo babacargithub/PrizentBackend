@@ -16,7 +16,7 @@
     @endforeach
 
     @foreach(config('backpack.base.mix_styles', []) as $path => $manifest)
-        <link rel="stylesheet" type="text/css" href="{{ mix($path, $manifest) }}">
+{{--        <link rel="stylesheet" type="text/css" href="{{ mix($path, $manifest) }}">--}}
     @endforeach
 
     @if(!empty(config('backpack.base.vite_styles', [])))

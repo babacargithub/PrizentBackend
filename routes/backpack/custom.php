@@ -1,8 +1,11 @@
 <?php
 
 use App\Http\Controllers\Admin\BadgeController;
+use App\Http\Controllers\Admin\CompanyCrudController;
 use App\Http\Controllers\Admin\QrCodeAdminController;
 use App\Http\Controllers\Admin\RapportController;
+use App\Models\Feature;
+use App\Models\Formule;
 use Illuminate\Support\Facades\Route;
 
 // --------------------------
@@ -35,6 +38,9 @@ Route::group([
     Route::get("qr_codes/unused_qr_codes/{quantity}",[QrCodeAdminController::class,"getUnusedQrCodes"])->name('qr-codes.unused');
     Route::get("soldes",[RapportController::class,"soldes"])->name('soldes.solde');
     Route::get("stats",[RapportController::class,"stats"])->name('stats.stats');
+    Route::get("create_abonnement",[CompanyCrudController::class,"createAbonnementForm"])->name('company-crud.create-abonnement-form');
+    Route::post('abonnements/{company}/create_custom_abonnement',[CompanyCrudController::class,"createCustomAbonnement"])->name('company-crud.create-custom-abonnement');
+
 
     Route::crud('commercial', 'CommercialCrudController');
 }); // this should be the absolute last line of this file

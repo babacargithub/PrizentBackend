@@ -4,6 +4,10 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
+// import 'bootstrap/dist/css/bootstrap.css'
+
+
+
 import './bootstrap';
 import { createApp } from 'vue';
 
@@ -42,10 +46,12 @@ import GenerateQrCode from './components/GenerateQRCodeBatch.vue';
 import QRCodesIndex from './components/QrCodeIndex.vue';
 import GenerateBadge from './components/GenerateBatch.vue';
 import Swal from "sweetalert2";
+import CreateCompanyAbonnement from "./components/CreateCompanyAbonnement.vue";
 app.component('badges-index', BadgesIndex);
 app.component('qr-codes-index', QRCodesIndex);
 app.component('generate-badge', GenerateBadge);
 app.component('generate-qrcode', GenerateQrCode);
+app.component('create-company-abonnement', CreateCompanyAbonnement);
 
 /**
  * The following block of code may be used to automatically register your
@@ -99,4 +105,5 @@ app.mixin({
 app
 .use(Quasar, {
     plugins: {Loading, Dialog}, // import Quasar plugins and add here
-}).mount('#app');
+})
+    .mount('#app');

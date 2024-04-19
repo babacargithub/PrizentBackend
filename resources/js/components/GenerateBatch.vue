@@ -70,7 +70,9 @@
 
             <div ref="images" class="q-gutter-lg">
                 <template v-if="badges.length > 0">
-                    <div :key="index" v-for="(badge,index) in badges" :ref="'qr_code_'+index" :id="'qr_code_'+index" class="q-card  row full-width  " style="background-color: #1D9053; height: 85.6mm; width: 53.98mm; border-radius: 2%">
+                    <div :key="index" v-for="(badge,index) in badges" :ref="'qr_code_'+index" :id="'qr_code_'+index"
+                         class="q-card  row full-width  " style="background-color: #1D9053; height: 698px; width:
+                         1004px; border-radius: 2%">
                         <div class="col-12 text-center q-pt-lg">
                             <span style="font-size: 30px; font-weight: bold; font-family: Helvetica,sans-serif" class="title text-white">Badge Prizent</span>
                         </div>

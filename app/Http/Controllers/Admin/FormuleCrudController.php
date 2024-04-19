@@ -72,20 +72,35 @@ class FormuleCrudController extends CrudController
         CRUD::setValidation(FormuleRequest::class);
 
         CRUD::field('nom');
-        CRUD::field('comment');
-        CRUD::field('limite');
+        $this->crud->addField([
+            'name' => 'limite',
+            'label' => "Maximum d'employés",
+            'type' => 'number'
+        ]);
         CRUD::field('prix');
-        CRUD::field('duree');
-        CRUD::field('unite');
+        $this->crud->addField([
+            'name' => 'unite',
+            'label' => "La formule est valable pour",
+            'type' => 'select_from_array',
+            'options' => ['jour'=>'jour', 'semaine'=>'semaine','mois' => 'mois', 'année' => 'année']
+        ]);
+        $this->crud->addField([
+            'name' => 'duree',
+            'label' => "Durée",
+            'type' => 'number'
+        ]);
+
+
+
         $this->crud->addField([
             'name' => 'features',
             'label' => "Fonctionnalités",
-            'type' => 'select',
+            'type' => 'select_multiple',
             'entity' => 'features',
-            'attribute' => 'nom',
+            'attribute' => 'public_name',
             'multiple' => true,
             'model' => "App\Models\Feature",
-            'pivot' => false,
+            'pivot' => true,
         ]);
 
         /**
@@ -104,5 +119,15 @@ class FormuleCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+    }
+    public function setupShowOperation()
+    {
+        $this->autoSetupShowOperation();
+        $this->crud->addColumn( ['label'     => 'Fonctionnalités', // Table column heading
+   'type'      => 'select_multiple',
+   'name'      => 'features', // the method that defines the relationship in your Model
+   'entity'    => 'features', // the method that defines the relationship in your Model
+   'attribute' => 'public_name', // foreign key attribute that is shown to user
+   'model'     => 'App\Models\Feature', ]); // the method that defines the relationship in your Model
     }
 }
