@@ -64,7 +64,11 @@
                 </div>
             </q-card>-->
 <!--            <q-btn @click="renderImages">Render images</q-btn>-->
-            <button class="btn btn-danger col-md-2 col-sm-12" @click="save">Zip les images</button>
+            <button class="btn btn-danger col-md-2 col-sm-12" @click="save">Télécharger les images</button>
+            <button class="btn btn-outline-success offset-1 col-md-2 col-sm-12" @click="saveToExcelFile()"><i
+                class="fa fa-file-excel"></i>Exporter au
+                format
+                excel</button>
 
 
 
@@ -110,6 +114,7 @@ import AlertError from "./AlertError.vue";
 import html2canvas from "html2canvas";
 import QRCode from "qrcode";
 import JSZip from "jszip";
+import XLSX from "xlsx";
 import { saveAs } from 'file-saver';
 export default {
     name: "GenerateBadge",
@@ -183,6 +188,7 @@ export default {
 
 
         },
+
         renderImages(){
             let imagesContainer = this.$refs.images
             let tempArray = [];

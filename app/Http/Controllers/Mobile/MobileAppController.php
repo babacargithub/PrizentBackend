@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePointageRequest;
 use App\Http\Resources\Mobile\PointageMobileResource;
 use App\Models\Badge;
+use App\Models\Company;
 use App\Models\Employe;
 use App\Models\Journee;
 use App\Models\Pointage;
@@ -37,7 +38,7 @@ class MobileAppController extends Controller
     public function getQrCode($qrCodeNumber)
 
     {
-        $qrCode = QrCode::whereNumber($qrCodeNumber)->first();
+        $qrCode = QrCode::whereNumber($qrCodeNumber)->whereCompanyId(Employe::requiredLoggedInEmploye()->company_id)->first();
         if ($qrCode == null){
             return  response()->json(["message"=>"QR code introuvable "])->setStatusCode(404);
         }
@@ -54,16 +55,17 @@ class MobileAppController extends Controller
         $dateStart = Carbon::now()->startOfMonth();
         $dateEnd = Carbon::now()->endOfMonth();
         $employe = Employe::requiredLoggedInEmploye();
-        $query = Pointage::where("employe_id",$employe->id )
+        $queryEntree = Pointage::where("employe_id",$employe->id )
             ->whereRelation("journee","calendrier",">=", $dateStart->toDateString())
             ->whereRelation("journee","calendrier","<=", $dateEnd->toDateString())
             ->orderBy('id',"desc");
+        $querySortie = clone $queryEntree;
         $entrees = PointageMobileResource::collection(
-            $query
-                ->whereType(Pointage::POINTAGE_SORTIE)
+            $queryEntree
+                ->whereType(Pointage::POINTAGE_ENTREE)
                 ->get());
         $sorties = PointageMobileResource::collection(
-            $query
+            $querySortie
                 ->whereType(Pointage::POINTAGE_SORTIE)
                 ->get());
 
@@ -88,7 +90,11 @@ class MobileAppController extends Controller
         }else{
             throw new InvalidArgumentException("Type de qr code inconnu ");
         }
-        $journee = Journee::firstOrCreate(["calendrier"=> Carbon::today()->toDateString(), "name" => Carbon::now()->format("d-m-Y")]);
+
+
+        $employe = Employe::whereId($request->input("employe_id"))->firstOrFail();
+        $journee = $this->getJourneePointage($employe);
+
         $pointage->journee()->associate($journee);
         $pointage->scanned_at = Carbon::now()->toTimeString();
         $pointage->calculerPonctualite();
@@ -105,15 +111,16 @@ class MobileAppController extends Controller
     {
          $validated = $request->validate([
             "badge_physique"=>"required|boolean",
-             "type"=>["required","integer",
-                 Rule::in([1, 2]),
+             "type"=>["required","string",
+                 Rule::in(['in', 'out']),
             "employe_id"=>[
                 "required",
                 "integer",
                 Rule::unique('pointages')->where(function (Builder $query) use ($request) {
                     $query->where('employe_id', $request->get("employe_id",0));
                     $query->where("journee_id", Journee::today()->id);
-                    $query->where("type", $request->get("type",0) == QrCode::TYPE_ENTREE? Pointage::POINTAGE_ENTREE: Pointage::POINTAGE_SORTIE);
+                    $query->where("type", $request->get("type",null) == QrCode::TYPE_ENTREE? Pointage::POINTAGE_ENTREE:
+                        Pointage::POINTAGE_SORTIE);
                 })
             ],
 
@@ -164,7 +171,8 @@ class MobileAppController extends Controller
         $type = $validated['type'];
         $qrCode = Employe::requiredLoggedInEmploye()->company->qrCodes()->whereType($type)->first();
         if ($qrCode == null){
-            return  response()->json(["message"=>"Aucun QR code crée pour la société. Crée un d'abord"])->setStatusCode(422);
+            return  response()->json(["message"=>"Il semble que votre société ne dispose pas de code QR ! Si c'est le cas commencez d'abord par en demander un à notre support technique."])
+                ->setStatusCode(422);
         }
 
 
@@ -178,9 +186,9 @@ class MobileAppController extends Controller
         }else{
             throw new InvalidArgumentException("Type de qr code inconnu ");
         }
-        $journee = Journee::firstOrCreate(["calendrier"=> Carbon::today()->toDateString(), "name" => Carbon::now()->format("d-m-Y")]);
+        $employe = Employe::whereId($validated["employe_id"])->orWhereRelation("badge","number",$validated["employe_id"])->firstOrFail();
+        $journee = $this->getJourneePointage($employe);
         $pointage->journee()->associate($journee);
-        $employe = Employe::whereId($validated["employe_id"])->orWhereRelation("badge","number",$validated["employe_id"])->first();
         $pointage->employe()->associate($employe);
         $pointage->qrCode()->associate($qrCode);
         $pointage->scanned_at = Carbon::now()->toTimeString();
@@ -189,5 +197,17 @@ class MobileAppController extends Controller
 
         return $pointage;
 
+    }
+    public function getJourneePointage(Employe $employe): Journee
+    {
+        $journee = Journee::firstOrCreate(["calendrier"=> Carbon::today()->toDateString(), "name" => Carbon::now()
+        ->format("d-m-Y")]);
+        $day = $journee->calendrier->dayOfWeekIso;
+
+        $horaire =  $employe->horaires()->where("jour",$day)->firstOrFail();
+        if ($horaire->sortie_lendemain){
+            $journee = Journee::firstOrCreate(["calendrier"=> Carbon::yesterday()->toDateString(), "name" => Carbon::yesterday()->format("d-m-Y")]);
+        }
+        return $journee;
     }
 }

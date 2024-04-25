@@ -32,9 +32,10 @@ class StorePointageRequest extends FormRequest
             "qr_code_id"=>"required|integer",
             "employe_id"=>["required","integer",
                 new CompanyHasActiveSubscription(),
-              Rule::unique(QrCode::find($this->request->get("qr_code_id",0))->type == QrCode::TYPE_ENTREE? 'entrees': "sorties")->where(function (Builder $query) {
+              Rule::unique("pointages")->where(function (Builder $query) {
               $query->where('employe_id', $this->request->get("employe_id",0));
               $query->where("journee_id", Journee::today()->id);
+              $query->whereType(QrCode::find($this->request->get("qr_code_id",0))->type);
               })
                 ],
             "device"=>"required|array|required_array_keys:uuid"

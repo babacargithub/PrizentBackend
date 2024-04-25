@@ -30,7 +30,14 @@ class StoreEmployeeRequest extends FormRequest
             "nom"=>"required|string|min:2",
             "email"=>"email|nullable|unique:employes",
             "telephone"=>['required','integer', new PhoneNumber(), new FormuleLimite()],
-            "sexe"=>"required|string|max:1"
+            "sexe"=>"required|string|max:1",
+            "horaires"=>"required|array",
+            "horaires.*.jour"=>"required|integer|between:1,7",
+            "horaires.*.entree"=>"required|date_format:H:i",
+            "horaires.*.sortie"=>"required|date_format:H:i",
+            "horaires.*.repos"=>"required|boolean",
+            "horaires.*.sortie_lendemain"=>"required|boolean",
+
             //
         ];
     }

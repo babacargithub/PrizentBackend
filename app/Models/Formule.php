@@ -28,4 +28,12 @@ class Formule extends Model
     {
         return  $this->features()->whereConstantName($feature)->exists();
     }
+    protected $casts = [
+        'custom' => 'boolean',
+    ];
+    public function isCustom(): bool
+    {
+        return (bool)$this->custom;
+    }
 }
+

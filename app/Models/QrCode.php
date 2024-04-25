@@ -26,5 +26,17 @@ class QrCode extends Model
         return AppParams::first()->maximum_distance?? 100;
 
     }
+    public function getTypeAttribute(): string
+    {
+        if ($this->attributes['type'] == 1 )
+        {
+            return 'in';
+        }elseif ($this->attributes['type'] == 2){
+            return 'out';
+        }
+        else{
+            return  $this->attributes['type'];
+        }
+    }
     protected $appends = ["maximum_distance"];
 }

@@ -37,4 +37,8 @@ class Abonnement extends Model
     {
         return $this->hasMany(Payment::class);
     }
+    public function isCustom(): bool
+    {
+        return (bool)$this->formule()->first()->isCustom();
+    }
 }

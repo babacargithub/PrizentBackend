@@ -38,9 +38,12 @@ class Pointage extends Model
         $tempsActuel = Carbon::now();
         $horaireEntree = $horaire->entree;
         $horaireSortie = $horaire->sortie;
-        $ponctualite = $this->type == self::POINTAGE_ENTREE ? $horaireSortie->diffInMinutes($tempsActuel, false)
-        : $tempsActuel->diffInMinutes($horaireEntree, false);
+        $ponctualite = $this->type == self::POINTAGE_ENTREE ?
+            $tempsActuel->diffInMinutes($horaireEntree, false)
+        : $horaireSortie->diffInMinutes($tempsActuel, false);
         $this->attributes["ponctualite"] = $ponctualite;
+        /*dd($horaireSortie, $tempsActuel, $ponctualite,$horaireEntree,$tempsActuel->diffInMinutes($horaireEntree,
+            false),$horaireSortie->diffInMinutes($tempsActuel, false));*/
 
         return $this;
 

@@ -11,8 +11,10 @@ class Journee extends Model
     use HasFactory;
     public $timestamps = false;
     protected $fillable = ["calendrier","name","ferie"];
-    protected $dates = ["calendrier"];
-    protected $casts =["ferie"=>"bool"];
+
+    protected $casts =[
+        "ferie"=>"bool",
+        "calendrier"=>"date"];
 
     public static function today(): Journee
     {

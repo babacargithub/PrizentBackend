@@ -37,7 +37,9 @@
                 </div>
             </form>
 
-            <button class="btn btn-danger col-md-2 col-sm-12" @click="saveImages">Zip les images</button>
+            <button class="btn btn-danger col-md-2 col-sm-12" @click="saveImages">Télécharger les images</button>
+            <button class="btn btn-outline-success offset-1 col-md-2 col-sm-12" @click="saveQrCodesToExcelFile">Exporter en
+                Excel</button>
 
             <div ref="images" class="q-gutter-lg">
                 <template v-if="qr_codes.length > 0">
@@ -89,6 +91,7 @@ import QRCode from "qrcode";
 import JSZip from "jszip";
 
 import { saveAs } from 'file-saver';
+import XLSX from "xlsx";
 export default {
     name: "GenerateBadge",
     components: {AlertError},
@@ -163,6 +166,15 @@ export default {
             })
 
 
+        },
+        saveQrCodesToExcelFile(){
+            let data = this.qr_codes.map(badge=>{
+                return {number: badge.number, type: this.type_generate}
+            })
+            let ws = XLSX.utils.json_to_sheet(data);
+            let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Badges");
+            XLSX.writeFile(wb, "qr_codes.xlsx");
         },
         renderImages(){
             let tempArray = [];

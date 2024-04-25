@@ -34,6 +34,9 @@ def add_rounded_corners(im, rad):
 # parser.add_argument('--type', type=str, help='Type of the QR code. It can be either in or out.')
 #
 # args = parser.parse_args()
+output_folder = None
+
+
 def generate_badge_image(data):
     # # Define PVC size at 300 DPI
     A5_PIXELS_X = 1004
@@ -104,7 +107,8 @@ def generate_badge_image(data):
     a5_img.paste(taglineRectangle, ((A5_PIXELS_X - taglineRectangle.size[0]) // 2, 550))
     # Save the image
     a5_img = a5_img.convert('RGBA')
-    a5_img.save(f'output/badge_{qr_data}.png')
+    output = output_folder if output_folder else f'/Users/macm22023/Documents/QR_CODES'
+    a5_img.save(f'{output}/badge_{qr_data}.png')
 
 
 def generate_qr_code_image(data, qr_code_type):
@@ -166,7 +170,8 @@ def generate_qr_code_image(data, qr_code_type):
     draw.text((700, 2180), qr_code_data, fill="white", font=font_small)
 
     # Save the image
-    a5_img.save(f'/Users/macm22023/Documents/QR_CODES/qr_code_image_{qr_code_data}.png')
+    output = output_folder if output_folder else f'/Users/macm22023/Documents/QR_CODES'
+    a5_img.save(f'{output}/qr_code_image_{qr_code_data}.png')
 
 
 def load_excel(file_type):
@@ -201,9 +206,20 @@ def load_excel(file_type):
             messagebox.showerror("Error", f"Failed to read the Excel file: {e}")
 
 
+def choose_output_dir():
+    try:
+        global output_folder
+        output_folder = filedialog.askdirectory()
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to choose output directory: {e}")
+
+
 # Create the main window
 root = tk.Tk()
-root.title("Excel File Processor")
+root.title("QR code or badge generator")
+qr_code_frame = tk.Frame(root, bg='#80c1ff', bd=5)
+qr_code_frame.grid(row=0, column=6)
+qr_code_frame.pack()
 
 # Set a minimum window size
 root.minsize(900, 900)  # Increased height to accommodate listbox
@@ -213,6 +229,8 @@ load_button = tk.Button(root, text="Charger fichier de QR Codes", command=lambda
 load_button.pack(pady=10)
 load_badge_button = tk.Button(root, text="Charger fichier de badges", command=lambda: load_excel('badge'))
 load_badge_button.pack(pady=10)
+output_button = tk.Button(root, text=f"Dossier de destination {output_folder}", command=lambda: choose_output_dir())
+output_button.pack(pady=10)
 
 # Start the GUI event loop
 root.mainloop()

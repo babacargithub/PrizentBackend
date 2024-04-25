@@ -42,7 +42,7 @@ class CompanyController extends Controller
         if ($abonnement != null){
             $abonnement->load('formule');
         }
-        $formules = Formule::with("features")->get();
+        $formules = $abonnement->isCustom()?[]: Formule::with("features")->get();
 
         return ["abonnement"=>$abonnement, "formules"=>$formules];
     }
